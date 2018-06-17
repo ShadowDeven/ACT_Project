@@ -7,7 +7,7 @@
  ************************************************************************/
 #include "share.h"
 extern int execute_ns3_2(int mode);
-extern int total_execution;
+extern int TOTAL_EXECUTION;
 extern void prepare_before_config_vec(vector<struct Test_Parems>& vec_test_para);
 extern int granularity;
 extern int read_from_file(char* filename1, COVG_MAP_VEC& trace, Config_Map& map_config,  vector<struct Test_Parems>& test_para_vec);
@@ -507,7 +507,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 		
 		new_test_para.app_speed = a1 * it_config->second[config_index].app_speed + a2 * test_limit.app_speed_inc_output_vec[random_range_zero(test_limit.app_speed_inc_output_vec.size())];
 
-		new_test_para.rng_run = total_execution + 1;
+		new_test_para.rng_run = TOTAL_EXECUTION + 1;
 		vector<struct Test_Parems> tmp_vector;
 		if (feedback_mode == 1)
 		{
@@ -561,7 +561,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 			a2 = 1 - a1;
 			new_test_para.app_speed = a1 * it_config->second[config_index].app_speed + a2 * test_limit.app_speed_dec_output_vec[random_range_zero(test_limit.app_speed_dec_output_vec.size())];
 
-			new_test_para.rng_run = total_execution + 1;
+			new_test_para.rng_run = TOTAL_EXECUTION + 1;
 
 			vector<struct Test_Parems> tmp_vector;
 			if (feedback_mode == 1)
@@ -628,7 +628,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				a2 = 1 - a1;
 
 				new_test_para.app_speed = a1 * tmp_test_parems_vec[0].first[0].app_speed + a2 * tmp_test_parems_vec[0].second[0].app_speed;
-				new_test_para.rng_run = total_execution + 1;
+				new_test_para.rng_run = TOTAL_EXECUTION + 1;
 
 				vector<struct Test_Parems> tmp_vector;
 				tmp_vector.push_back(new_test_para);
@@ -705,26 +705,26 @@ int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map
 			res = execute_ns3_2(0);
 			if (res == -2 )
 			{
-				total_execution--; //offsetting this execution
+				TOTAL_EXECUTION--; //offsetting this execution
 				break; //for exception
 			}
-			snprintf (mvcmd, 256, "/tmp/output/%d/messages", total_execution);
+			snprintf (mvcmd, 256, "/tmp/output/%d/messages", TOTAL_EXECUTION);
 			res = read_from_file(mvcmd, map_vec, map_config, new_test_para_vec[m]);
 
 			//after
-			snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_feedback%d/config_%d", feedback_mode, total_execution);
+			snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_feedback%d/config_%d", feedback_mode, TOTAL_EXECUTION);
 			total_folder_feedback++;
 			system(mvcmd);
 
 			if (res >= 2 && feedback_mode == 1)
 			{
-				cout << " feedback1 switching at: " << total_execution << endl;
+				cout << " feedback1 switching at: " << TOTAL_EXECUTION << endl;
 				return -1;
 			}
 
 			if (res == 3 && feedback_mode == 2)
 			{
-				cout << " feedback2 switching at: " << total_execution << endl;
+				cout << " feedback2 switching at: " << TOTAL_EXECUTION << endl;
 				return -1;
 			}
 		}

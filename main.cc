@@ -20,7 +20,7 @@ using namespace std;
 
 //all global functional variables
 //int TRIES_RANDOM = 0;	
-int total_execution = 0;	//counter of the num of executions 
+int TOTAL_EXECUTION = 0;	//counter of the num of executions 
 int MAIL_MODE = 0;	//switch of email alert function
 int TRIES_PER = 1; //define how many times ns3 runs for a group of input parameters
 //#define TRIES_PER 1 //For each configuration
@@ -157,9 +157,9 @@ int read_from_file(char* filename1, COVG_MAP_VEC& trace, Config_Map& map_config,
 
 	/*
 	//Another way is to switch according to execution times
-	if (total_execution >= 55000 ) return 3 ;//to switching for feedback 2
-	if (total_execution == 21000 ) return 2 ;//to switching for feedback 1
-	if (total_execution == 5000 ) return 1 ;//to switching for random
+	if (TOTAL_EXECUTION >= 55000 ) return 3 ;//to switching for feedback 2
+	if (TOTAL_EXECUTION == 21000 ) return 2 ;//to switching for feedback 1
+	if (TOTAL_EXECUTION == 5000 ) return 1 ;//to switching for random
 	*/
 	return 0 ;
 }
@@ -171,7 +171,7 @@ void prepare_before_config_vec(vector<struct Test_Parems>& vec_test_para)
 	system("mkdir /tmp/output");
 	ofstream output_file("/tmp/input_config.txt");
 
-	//total_execution++;
+	//TOTAL_EXECUTION++;
 	
 	//print the input parameter value
 	if (output_file)
@@ -216,7 +216,7 @@ void prepare_before_config_vec(vector<struct Test_Parems>& vec_test_para)
 int execute_ns3_2(int mode)
 {
 	char cmd[512];
-	snprintf (cmd, 512, "sudo sh dce.sh dce-linux %d", total_execution);
+	snprintf (cmd, 512, "sudo sh dce.sh dce-linux %d", TOTAL_EXECUTION);
 
 	if (DEBUG) cout << cmd << endl;
 	
@@ -235,7 +235,7 @@ int execute_ns3_2(int mode)
 int try_per_config(int i, int mode) {	//test input i
 	
 	char mvcmd[256] = {0};
-	total_execution++;
+	TOTAL_EXECUTION++;
 	
 	//set test input parameters
 	struct Test_Parems test_para;
@@ -246,7 +246,7 @@ int try_per_config(int i, int mode) {	//test input i
 	//get random value, the random algorithm is from gsl
 	random_input_value(test_para);
 	
-	test_para.rng_run = total_execution;
+	test_para.rng_run = TOTAL_EXECUTION;
 	test_para_vec.push_back(test_para);
 	
 	//print the value of the inputs
@@ -261,17 +261,17 @@ int try_per_config(int i, int mode) {	//test input i
 	
 	if (res == -2){		//if execution fails
 	
-		total_execution--; //offsetting this execution
+		TOTAL_EXECUTION--; //offsetting this execution
 		//return -2; // used for skip exception
 	}
 	else{		//when ns3 success
 	
 		//config ns3 output, check map coverage
-		snprintf (mvcmd, 256, "/tmp/output/%d/messages", total_execution);
+		snprintf (mvcmd, 256, "/tmp/output/%d/messages", TOTAL_EXECUTION);
 		res = read_from_file(mvcmd, covg_map_vec, config_map, test_para_vec); 
 
 		//mv output filefolder to output_all
-		snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_all/config_%d", total_execution);
+		snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_all/config_%d", TOTAL_EXECUTION);
 		system(mvcmd);
 
 		if (DEBUG)
@@ -285,11 +285,11 @@ int try_per_config(int i, int mode) {	//test input i
 	}
 	/*
 	//print output values
-	snprintf (mvcmd, 256, "/tmp/output/%d/messages", total_execution);
+	snprintf (mvcmd, 256, "/tmp/output/%d/messages", TOTAL_EXECUTION);
 	res = read_from_file(mvcmd, covg_map_vec, config_map, test_para_vec); 
 
 	//after
-	snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_all/config_%d", total_execution);
+	snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_all/config_%d", TOTAL_EXECUTION);
 	system(mvcmd);
 
 	if (DEBUG)
@@ -328,11 +328,11 @@ int purely_random_testing(int mode)
 	int i = 1;
 	while(1)
 	{
-		cout << "the number of executions " << total_execution << endl;
+		cout << "the number of executions " << TOTAL_EXECUTION << endl;
 		res = try_per_config(i, mode);
 		if (res >= 1)// random testing saturated
 		{
-			cout << "random switching at: " << total_execution << endl;
+			cout << "random switching at: " << TOTAL_EXECUTION << endl;
 			return 0;
 		}
 		i++;
@@ -400,7 +400,7 @@ int main (int argc, char* argv[])
 
 	//After feedback coverage
 	cout << "[After Feedback] 5d coverage:" << endl;
-	cout << "total_execution:" << total_execution << endl;
+	cout << "TOTAL_EXECUTION:" << TOTAL_EXECUTION << endl;
 	cal_coverage_AllGrans(covg_map_vec);
 
 	if (MAIL_MODE) system ("sudo mail -s \"Experiment End Mention \" xxx@example.com < /dev/null ");
