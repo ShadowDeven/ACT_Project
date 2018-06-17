@@ -16,14 +16,18 @@
 #include "signal.h"
 #include "math.h"
 
-int TRIES_RANDOM = 0;
-int total_execution = 0;
-int MAIL_MODE = 0;
 using namespace std;
 
-//globel variable
-COVG_MAP_VEC covg_map_vec;
-Config_Map config_map;
+//all global functional variables
+//int TRIES_RANDOM = 0;	
+int total_execution = 0;	//counter of the num of executions 
+int MAIL_MODE = 0;	//switch of email alert function
+int TRIES_PER = 1; //define how many times ns3 runs for a group of input parameters
+//#define TRIES_PER 1 //For each configuration
+
+//global variables
+COVG_MAP_VEC covg_map_vec;	//map coverage vector 
+Config_Map config_map;		//typedef map<int, vector<struct Test_Parems> > Config_Map
 struct RANGE_INFO range_info;
 struct Record_average average_record;
 vector<pair<struct Test_Parems, Record_average> > input_output_relation;
@@ -31,6 +35,7 @@ INPUT_OUT_MAP input_output_map;
 
 int index_i = 0;
 int granularity = 1;
+
 //format:d,c:%u,s:%u,ca:%u,r:%u,o:%u,t:%u
 int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_config, vector<struct Test_Parems>& test_para_vec)
 {
@@ -110,30 +115,32 @@ int prev_coverage_size = 1;
 //This function is used to process ns3-dce traces and decide to switch feedbacks
 int read_from_file(char* filename1, COVG_MAP_VEC& trace, Config_Map& map_config,  vector<struct Test_Parems>& test_para_vec)
 {
-	string line1;
-	ifstream file1(filename1);
+	string get_line;
+	ifstream get_file(filename1);
 
-	if (!file1.is_open())
+	if (!get_file.is_open())
 	{
 		cerr << "Unable to open file:" << filename1 << "\n";
 		return -2; //for exception case
 	}
-	index_i = 0;
+	
+	//index_i = 0;
 	memset(&average_record, 0, sizeof(average_record));
 
-	while (getline(file1, line1))
+	while (getline(get_file, get_line))
 	{
-		convert_string_to_elem(line1, trace, map_config, test_para_vec);
+		convert_string_to_elem(get_line, trace, map_config, test_para_vec);
 	}
-	file1.close();
+	get_file.close();
 
 	total_files++;
 
 	cout << "Current files:" << total_files << endl;
 
-	if (total_files % 5000 == 0) //Check current coverage every 1000 times
+	if (total_files % 5000 == 0) //Check current coverage every 5000 times
 	{
-		double inc_per = (trace[7].coverage_map.size() - prev_coverage_size); //Percentage
+		
+		double inc_per = (trace[7].coverage_map.size() - prev_coverage_size); //get percentage of map coverage growth
 
 		cout << "[Coverage:] every 5000 times:" << trace[7].coverage_map.size()  << " ,prev_coverage_size:" << prev_coverage_size << ", growth %: " << inc_per << " , total files:" << total_files << endl;
 
@@ -148,11 +155,12 @@ int read_from_file(char* filename1, COVG_MAP_VEC& trace, Config_Map& map_config,
 		system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches"); //used to free system resource
 	}
 
+	/*
 	//Another way is to switch according to execution times
-	//if (total_execution >= 55000 ) return 3 ;//to switching for feedback 2
-	//if (total_execution == 21000 ) return 2 ;//to switching for feedback 1
-	//if (total_execution == 5000 ) return 1 ;//to switching for random
-
+	if (total_execution >= 55000 ) return 3 ;//to switching for feedback 2
+	if (total_execution == 21000 ) return 2 ;//to switching for feedback 1
+	if (total_execution == 5000 ) return 1 ;//to switching for random
+	*/
 	return 0 ;
 }
 
@@ -163,7 +171,9 @@ void prepare_before_config_vec(vector<struct Test_Parems>& vec_test_para)
 	system("mkdir /tmp/output");
 	ofstream output_file("/tmp/input_config.txt");
 
-	total_execution++;
+	//total_execution++;
+	
+	//print the input parameter value
 	if (output_file)
 	{
 		output_file << vec_test_para.size() << "\n";
@@ -209,6 +219,7 @@ int execute_ns3_2(int mode)
 	snprintf (cmd, 512, "sudo sh dce.sh dce-linux %d", total_execution);
 
 	if (DEBUG) cout << cmd << endl;
+	
 	int res = system(cmd);
 	if (res < 0 || res == 127)
 	{
@@ -219,32 +230,63 @@ int execute_ns3_2(int mode)
 	return 0;
 }
 
-#define TRIES_PER 1 //For each configuration
-int try_per_config(int i, int mode) //test input i
-{
+
+
+int try_per_config(int i, int mode) {	//test input i
+	
 	char mvcmd[256] = {0};
+	total_execution++;
+	
+	//set test input parameters
 	struct Test_Parems test_para;
 	vector<struct Test_Parems> test_para_vec;
+	
 	int res = 0;
-
+	
+	//get random value, the random algorithm is from gsl
 	random_input_value(test_para);
-	test_para.rng_run = total_execution + 1;
+	
+	test_para.rng_run = total_execution;
 	test_para_vec.push_back(test_para);
-
-	//before
+	
+	//print the value of the inputs
 	prepare_before_config_vec(test_para_vec);
-	for (int j = 1; j <= TRIES_PER; j++)
-	{
+	
+	//launch ns3
+	for (int j = 1; j <= TRIES_PER; j++){
+		
 		res = execute_ns3_2(0); //mode 0
 	}
-	if (res == -2)
-	{
+	
+	
+	if (res == -2){		//if execution fails
+	
 		total_execution--; //offsetting this execution
-		return -2; // used for skp exception
+		//return -2; // used for skip exception
 	}
+	else{		//when ns3 success
+	
+		//config ns3 output, check map coverage
+		snprintf (mvcmd, 256, "/tmp/output/%d/messages", total_execution);
+		res = read_from_file(mvcmd, covg_map_vec, config_map, test_para_vec); 
 
+		//mv output filefolder to output_all
+		snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_all/config_%d", total_execution);
+		system(mvcmd);
+
+		if (DEBUG)
+		{
+			cout << "Input Test_Parems:" << endl;
+			test_para.print();
+		}
+
+		input_output_relation.push_back(make_pair(test_para, average_record));
+	
+	}
+	/*
+	//print output values
 	snprintf (mvcmd, 256, "/tmp/output/%d/messages", total_execution);
-	res = read_from_file(mvcmd, covg_map_vec, config_map, test_para_vec); //
+	res = read_from_file(mvcmd, covg_map_vec, config_map, test_para_vec); 
 
 	//after
 	snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_all/config_%d", total_execution);
@@ -257,7 +299,7 @@ int try_per_config(int i, int mode) //test input i
 	}
 
 	input_output_relation.push_back(make_pair(test_para, average_record));
-
+	*/
 	return res;
 }
 
@@ -326,12 +368,13 @@ Output folder:
 int main (int argc, char* argv[])
 {
 	freopen("log.txt", "w", stdout); // Log file will generated to log.txt
-	MAIL_MODE = 1; //default is disable
+	MAIL_MODE = 0; //default is disable
 	random_init(); // init for random generator
 	cout << "free up system memory for this experiment !\n";
 	system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches");
 
-	if (MAIL_MODE) system ("echo \" Purely Random Test Starts\" | mail -s \" System Automatic Message\" zhaodeven@gmail.com");
+	//if (MAIL_MODE) system ("sudo mail -s \"Experiment Begin Mention \" xxx@example.com < /dev/null ");
+
 	//char cmd[512];
 
 	init_coverage_map_vec();
@@ -360,6 +403,8 @@ int main (int argc, char* argv[])
 	cout << "total_execution:" << total_execution << endl;
 	cal_coverage_AllGrans(covg_map_vec);
 
-	if (MAIL_MODE) system ("echo \" Purely Random Test Finishes\" | mail -s \" System Automatic Message\" zhaodeven@gmail.com");
+	if (MAIL_MODE) system ("sudo mail -s \"Experiment End Mention \" xxx@example.com < /dev/null ");
+
 	exit(0);
 }
+
