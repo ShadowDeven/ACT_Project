@@ -36,6 +36,8 @@ INPUT_OUT_MAP input_output_map;
 int index_i = 0;
 int granularity = 1;
 
+unsigned int prev_state_buff = 0;
+
 //format:d,c:%u,s:%u,ca:%u,r:%u,o:%u,t:%u
 int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_config, vector<struct Test_Parems>& test_para_vec)
 {
@@ -94,25 +96,32 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
 	average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
 	average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
+	average_record.prev_state_aver += (prev_state_buff - average_record.prev_state_aver) * 1.0 / (index_i + 1);
 	average_record.target_aver += (target - average_record.target_aver) * 1.0 / (index_i + 1);
 	index_i++;
 
 	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE && srtt > 0 && srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE && state >= 0 && state < STATE_RANGE && curr_time > 0 && target > 0 && target <= TARGET_RANGE)  //ssthresh at least 2
 	{
-		struct State_Record tmp(cwnd, ssthresh, srtt, rttvar, state, target, curr_time);
-		insert_state(tmp, trace, test_para_vec, map_config);
+		struct State_Record tmp(cwnd, ssthresh, srtt, rttvar, state, prev_state_buff, target, curr_time);
+		insert_state(tmp, trace, map_config, test_para_vec);
 	}
+	
+	prev_state_buff = state;
 	return 0;
 }
 
 //about 1.5 percent of  2048 total size (given 128 size granularity)
-#define COVG_LIMIT_RANDOM  30
-#define COVG_LIMIT_FEEDBACK1  30
-#define COVG_LIMIT_FEEDBACK2  30
+#define COVG_LIMIT_RANDOM  30*8
+#define COVG_LIMIT_FEEDBACK1  30*8
+#define COVG_LIMIT_FEEDBACK2  30*8
 int total_files = 0;
 int prev_coverage_size = 1;
 
-//This function is used to process ns3-dce traces and decide to switch feedbacks
+/*
+This function is used to process ns3-dce traces and decide to switch feedbacks
+4 inputs, ns-3 datafile name, map coverage vector, ...., test parameter vector
+return -1 if unable to open file, 0 if success
+*/
 int read_from_file(char* filename1, COVG_MAP_VEC& trace, Config_Map& map_config,  vector<struct Test_Parems>& test_para_vec)
 {
 	string get_line;
@@ -121,7 +130,7 @@ int read_from_file(char* filename1, COVG_MAP_VEC& trace, Config_Map& map_config,
 	if (!get_file.is_open())
 	{
 		cerr << "Unable to open file:" << filename1 << "\n";
-		return -2; //for exception case
+		return -1; //for exception case
 	}
 	
 	//index_i = 0;
@@ -137,6 +146,15 @@ int read_from_file(char* filename1, COVG_MAP_VEC& trace, Config_Map& map_config,
 
 	cout << "Current files:" << total_files << endl;
 
+
+	return 0 ;
+}
+
+/*
+The function to check map coverage
+*/
+int coverage_check(COVG_MAP_VEC& trace){
+
 	if (total_files % 5000 == 0) //Check current coverage every 5000 times
 	{
 		
@@ -148,7 +166,7 @@ int read_from_file(char* filename1, COVG_MAP_VEC& trace, Config_Map& map_config,
 		prev_coverage_size = trace[7].coverage_map.size(); // Defalut focus on 128 size coverage
 
 		// could add a switching time; random could be just 10%, feedback apply different %
-		if (inc_per < COVG_LIMIT_FEEDBACK2) return 3 ;//to switching for feedback 2*/
+		if (inc_per < COVG_LIMIT_FEEDBACK2) return 3 ;//to switching for feedback 2
 		if (inc_per < COVG_LIMIT_FEEDBACK1) return 2 ;//to switching for feedback 1
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
 
@@ -161,9 +179,7 @@ int read_from_file(char* filename1, COVG_MAP_VEC& trace, Config_Map& map_config,
 	if (TOTAL_EXECUTION == 21000 ) return 2 ;//to switching for feedback 1
 	if (TOTAL_EXECUTION == 5000 ) return 1 ;//to switching for random
 	*/
-	return 0 ;
 }
-
 
 void prepare_before_config_vec(vector<struct Test_Parems>& vec_test_para)
 {
@@ -224,17 +240,20 @@ int execute_ns3_2(int mode)
 	if (res < 0 || res == 127)
 	{
 		cerr << "cannot execute the ns3 script sucessfully, retval:" << res << endl;
-		return -2;
+		return -1;
 	}
 
 	return 0;
 }
 
-
-
+/*
+run ns-3 and check for return status
+-1 is fails, 0 is success and no switch, >0 is saturate and switch mode
+*/
 int try_per_config(int i, int mode) {	//test input i
 	
 	char mvcmd[256] = {0};
+	
 	TOTAL_EXECUTION++;
 	
 	//set test input parameters
@@ -253,13 +272,13 @@ int try_per_config(int i, int mode) {	//test input i
 	prepare_before_config_vec(test_para_vec);
 	
 	//launch ns3
-	for (int j = 1; j <= TRIES_PER; j++){
+	/*for (int j = 1; j <= TRIES_PER; j++){
 		
 		res = execute_ns3_2(0); //mode 0
-	}
+	}*/
+	res = execute_ns3_2(0);
 	
-	
-	if (res == -2){		//if execution fails
+	if (res == -1){		//if execution fails
 	
 		TOTAL_EXECUTION--; //offsetting this execution
 		//return -2; // used for skip exception
@@ -268,9 +287,10 @@ int try_per_config(int i, int mode) {	//test input i
 	
 		//config ns3 output, check map coverage
 		snprintf (mvcmd, 256, "/tmp/output/%d/messages", TOTAL_EXECUTION);
-		res = read_from_file(mvcmd, covg_map_vec, config_map, test_para_vec); 
+		if(read_from_file(mvcmd, covg_map_vec, config_map, test_para_vec)==0) 
+			res = coverage_check(covg_map_vec);
 
-		//mv output filefolder to output_all
+		//mv output to output_all
 		snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_all/config_%d", TOTAL_EXECUTION);
 		system(mvcmd);
 
@@ -333,11 +353,11 @@ int purely_random_testing(int mode)
 		if (res >= 1)// random testing saturated
 		{
 			cout << "random switching at: " << TOTAL_EXECUTION << endl;
-			return 0;
+			break;
 		}
 		i++;
 	}
-	return 0;
+	return res;
 }
 
 int init_coverage_map_vec()

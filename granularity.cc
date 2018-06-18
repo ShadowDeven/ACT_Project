@@ -35,7 +35,7 @@ int state_granularity_mapping(struct State_Record& old_record, int granularity, 
 
 extern int GetId(enum Input_type input_type, struct Test_Parems tmp);
 
-int insert_state(struct State_Record& tmp, COVG_MAP_VEC& map_vec, vector<struct Test_Parems>& test_para_vec, Config_Map& config_map)
+int insert_state(struct State_Record& tmp, COVG_MAP_VEC& map_vec, Config_Map& config_map, vector<struct Test_Parems>& test_para_vec)
 {
 	int granularity = 0;
 
@@ -60,7 +60,7 @@ int insert_state(struct State_Record& tmp, COVG_MAP_VEC& map_vec, vector<struct 
 		int srtt = (tmp.srtt - 1) / granularity;
 		int rttvar = (tmp.rttvar - 1) / granularity;
 		int state = tmp.tcp_state ; // no grain for states
-		struct State_Record tmp_cube(cwnd, ssthresh, srtt, rttvar, state, target, 0);
+		struct State_Record tmp_cube(cwnd, ssthresh, srtt, rttvar, state, prev_state,target, 0);
 		Cube_State_Map::iterator it = map_vec[i].coverage_map.find(tmp_cube);
 
 		if (it != map_vec[i].coverage_map.end())
@@ -225,3 +225,4 @@ double cal_coverage_2d (int choice, int choice2, struct RANGE_INFO& range_info, 
 }
 
 #endif
+
