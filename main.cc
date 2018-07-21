@@ -36,7 +36,7 @@ INPUT_OUT_MAP input_output_map;
 int index_i = 0;
 int granularity = 1;
 
-unsigned int prev_state_buff = 0;
+unsigned int Prev_state = 0;
 
 //format:d,c:%u,s:%u,ca:%u,r:%u,o:%u,t:%u
 int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_config, vector<struct Test_Parems>& test_para_vec)
@@ -85,7 +85,7 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	state = stol(line.substr(ca_left, r_left - 3));
 	srtt = stol(line.substr(r_left, o_left - 3));
 	rttvar = stol(line.substr(o_left, t_left - 3));
-	target = stol(line.substr(t_left, u_left - 3));
+	//target = stol(line.substr(t_left, u_left - 3));
 	curr_time = stol(line.substr(u_left));
 
 	if (ssthresh == 2147483647) return 0; // remove inital slow start
@@ -96,17 +96,17 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
 	average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
 	average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
-	average_record.prev_state_aver += (prev_state_buff - average_record.prev_state_aver) * 1.0 / (index_i + 1);
-	average_record.target_aver += (target - average_record.target_aver) * 1.0 / (index_i + 1);
+	average_record.prev_state_aver += (Prev_state - average_record.prev_state_aver) * 1.0 / (index_i + 1);
+	//average_record.target_aver += (target - average_record.target_aver) * 1.0 / (index_i + 1);
 	index_i++;
 
-	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE && srtt > 0 && srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE && state >= 0 && state < STATE_RANGE && curr_time > 0 && target > 0 && target <= TARGET_RANGE)  //ssthresh at least 2
+	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE && srtt > 0 && srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE && state >= 0 && state < STATE_RANGE && curr_time > 0 )  //ssthresh at least 2
 	{
-		struct State_Record tmp(cwnd, ssthresh, srtt, rttvar, state, prev_state_buff, target, curr_time);
+		struct State_Record tmp(cwnd, ssthresh, srtt, rttvar, state, Prev_state, curr_time);
 		insert_state(tmp, trace, map_config, test_para_vec);
 	}
 	
-	prev_state_buff = state;
+	Prev_state = state;
 	return 0;
 }
 
@@ -114,6 +114,7 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 #define COVG_LIMIT_RANDOM  30*8
 #define COVG_LIMIT_FEEDBACK1  30*8
 #define COVG_LIMIT_FEEDBACK2  30*8
+#define INF 99999999999
 int total_files = 0;
 int prev_coverage_size = 1;
 
@@ -164,12 +165,17 @@ int coverage_check(COVG_MAP_VEC& trace){
 
 		cal_coverage_AllGrans (covg_map_vec);
 		prev_coverage_size = trace[7].coverage_map.size(); // Defalut focus on 128 size coverage
-
+		
 		// could add a switching time; random could be just 10%, feedback apply different %
 		if (inc_per < COVG_LIMIT_FEEDBACK2) return 3 ;//to switching for feedback 2
 		if (inc_per < COVG_LIMIT_FEEDBACK1) return 2 ;//to switching for feedback 1
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
-
+		
+		/*
+		if (inc_per < INF) return 3 ;//to switching for feedback 2
+                if (inc_per < INF) return 2 ;//to switching for feedback 1
+                if (inc_per < INF) return 1 ;//to switching for random
+		*/
 		system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches"); //used to free system resource
 	}
 
@@ -423,7 +429,7 @@ int main (int argc, char* argv[])
 	cout << "TOTAL_EXECUTION:" << TOTAL_EXECUTION << endl;
 	cal_coverage_AllGrans(covg_map_vec);
 
-	if (MAIL_MODE) system ("sudo mail -s \"Experiment End Mention \" xxx@example.com < /dev/null ");
+	//if (MAIL_MODE) system ("sudo mail -s \"Experiment End Mention \" xxx@example.com < /dev/null ");
 
 	exit(0);
 }

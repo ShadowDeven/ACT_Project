@@ -334,12 +334,12 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				uprange = covg_map_vec[i].range_info.prev_state_range;
 				index = empty_set.prev_tcp_state;
 				break;
-			case target:
-				uprange = covg_map_vec[i].range_info.target_range;
-				index = empty_set.target;
-				break;
+			//case target:
+				//uprange = covg_map_vec[i].range_info.target_range;
+				//index = empty_set.target;
+				//break;
 			default:
-				cout << "No matching output type!!!" << endl;
+				cout << "No matching output type: " <<output<< endl;
 				exit(-1);
 			}
 			if (DEBUG)
@@ -370,11 +370,11 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case prev_state:
 					empty_set.prev_tcp_state = uprange_i;
 					break;
-				case target:
-					empty_set.target = uprange_i;
-					break;
+				//case target:
+					//empty_set.target = uprange_i;
+					//break;
 				default:
-					cout << "No matching output type!!!" << endl;
+					cout << "No matching output type: " <<output<< endl;
 					exit(-1);
 				}
 				if (DEBUG)
@@ -417,11 +417,11 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case prev_state:
 					empty_set.prev_tcp_state = low_i;
 					break;
-				case target:
-					empty_set.target = low_i;
-					break;
+				//case target:
+					//empty_set.target = low_i;
+					//break;
 				default:
-					cout << "No matching output type!!!" << endl;
+					cout << "No matching output type: " <<output<< endl;
 					exit(-1);
 
 				}
@@ -675,10 +675,10 @@ int generate_new_test_para_vec_N(int feedback_mode, struct State_Record & empty_
 		return generate_new_test_para_vec_1D(feedback_mode, state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case prev_state:
 		return generate_new_test_para_vec_1D(feedback_mode, prev_state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
-	case target:
-		return generate_new_test_para_vec_1D(feedback_mode, target, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
+	//case target:
+		//return generate_new_test_para_vec_1D(feedback_mode, target, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	default:
-		cout << "No matching output type!!!" << endl;
+		cout << "No matching output type: " << i << endl;
 		exit(-1);
 	}
 
@@ -709,7 +709,7 @@ int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map
 			     << " " << empty_set.srtt
 			     << " " << empty_set.rttvar
 			     << " " << empty_set.tcp_state
-			     << " " << empty_set.target
+			     //<< " " << empty_set.target
 			     << endl;
 		}
 
