@@ -73,10 +73,10 @@ int find_empty_area_N(State_Record& empty_state, struct Grans_coverage_map& tmp_
 	{
 		tmp.cwnd = random_range_zero(tmp_map.range_info.cwnd_range) + 1;// 0 - 1023 in coverage map
 		tmp.ssthresh = random_range_zero(tmp_map.range_info.ssth_range) + 1;
-		tmp.srtt = random_range_zero(tmp_map.range_info.rtt_range) + 1;
-		tmp.rttvar = random_range_zero(tmp_map.range_info.rtvar_range) + 1;
-		tmp.tcp_state = random_range_zero(tmp_map.range_info.state_range);//0, 1, 2, 3
-		tmp.prev_tcp_state = random_range_zero(tmp_map.range_info.prev_state_range);//0, 1, 2, 3
+		//tmp.srtt = random_range_zero(tmp_map.range_info.rtt_range) + 1;
+		//tmp.rttvar = random_range_zero(tmp_map.range_info.rtvar_range) + 1;
+		//tmp.tcp_state = random_range_zero(tmp_map.range_info.state_range);//0, 1, 2, 3
+		//tmp.prev_tcp_state = random_range_zero(tmp_map.range_info.prev_state_range);//0, 1, 2, 3
 
 		// here empty point needs a mapping operation to be searched in coverage map; as the mapping is done when inserting point into coverage map;
 
@@ -272,10 +272,9 @@ int get_input_output_relation(Test_Parems_Limite& test_limit, Output_type output
 
 int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct State_Record original_empty_set, COVG_MAP_VEC& covg_map_vec, Config_Map& map_config, vector<vector<struct Test_Parems> > & new_test_para_vec, INPUT_OUT_MAP& input_output_map)
 {
-	if (DEBUG)
-	{
-		cout << "Output_type:" << output << endl;
-	}
+
+	cout << "Output_type:" << output << endl;
+
 	int index = 0, uprange = 0 , lowrange = -1;
 	int i = 0;
 	Cube_State_Map::iterator it ;
@@ -318,6 +317,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				uprange = covg_map_vec[i].range_info.ssth_range;
 				index = empty_set.ssthresh;
 				break;
+			/*
 			case srtt:
 				uprange = covg_map_vec[i].range_info.rtt_range;
 				index = empty_set.srtt;
@@ -334,18 +334,19 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				uprange = covg_map_vec[i].range_info.prev_state_range;
 				index = empty_set.prev_tcp_state;
 				break;
-			//case target:
-				//uprange = covg_map_vec[i].range_info.target_range;
-				//index = empty_set.target;
-				//break;
+			case target:
+				uprange = covg_map_vec[i].range_info.target_range;
+				index = empty_set.target;
+				break;
+				*/
 			default:
 				cout << "No matching output type: " <<output<< endl;
 				exit(-1);
 			}
-			if (DEBUG)
-			{
-				cout << "uprange:" << uprange << endl;
-			}
+
+			cout << "uprange:" << uprange << " lowrange:" << lowrange << endl;
+			
+			
 			// to looking for upbound state
 			int upbound = uprange ;
 			for (int uprange_i = index + 1 ; uprange_i < uprange ; uprange_i++) // -1 and up are low and high bounds;
@@ -358,6 +359,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case ssth:
 					empty_set.ssthresh = uprange_i;
 					break;
+				/*
 				case srtt:
 					empty_set.srtt = uprange_i;
 					break;
@@ -370,9 +372,9 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case prev_state:
 					empty_set.prev_tcp_state = uprange_i;
 					break;
-				//case target:
-					//empty_set.target = uprange_i;
-					//break;
+				case target:
+					empty_set.target = uprange_i;
+					break; */
 				default:
 					cout << "No matching output type: " <<output<< endl;
 					exit(-1);
@@ -388,7 +390,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				{
 					upbound = uprange_i;
 					break;
-				};
+				}
 			}
 
 			up_state = empty_set;
@@ -405,6 +407,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case ssth:
 					empty_set.ssthresh = low_i;
 					break;
+				/*
 				case srtt:
 					empty_set.srtt = low_i;
 					break;
@@ -417,9 +420,9 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case prev_state:
 					empty_set.prev_tcp_state = low_i;
 					break;
-				//case target:
-					//empty_set.target = low_i;
-					//break;
+				case target:
+					empty_set.target = low_i;
+					break; */
 				default:
 					cout << "No matching output type: " <<output<< endl;
 					exit(-1);
@@ -436,7 +439,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				{
 					lowbound = low_i;
 					break;
-				};
+				}
 			}
 
 			low_state = empty_set;
@@ -445,16 +448,15 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 			lowbound_limit = false;
 			if (lowbound == lowrange) lowbound_limit = true; // = -1
 			if (upbound == uprange) upbound_limit = true; // range_
-
+	
+			//find a limit point
 			if (!lowbound_limit || !upbound_limit)
 			{
-				//if (DEBUG)
-				{
-					if (lowbound_limit || upbound_limit)
-						cout << "[One Limit] FIND candidate points at granularity:" << covg_map_vec[i].granularity << endl;
-					else
-						cout << "[No Limit] FIND candidate points at granularity:" << covg_map_vec[i].granularity << endl;
-				}
+				if (lowbound_limit || upbound_limit)	
+					cout << "[One Limit] FIND candidate points at granularity:" << covg_map_vec[i].granularity << endl;
+				else
+					cout << "[No Limit] FIND candidate points at granularity:" << covg_map_vec[i].granularity << endl;
+				
 				break;
 			};
 		}
@@ -466,7 +468,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 	if (upbound_limit && lowbound_limit)
 	{
 		//if(DEBUG)
-		cout << "cannot find candidate points\n";
+		cout << "cannot find candidate points!";
 		return -1;
 	}
 
@@ -667,7 +669,7 @@ int generate_new_test_para_vec_N(int feedback_mode, struct State_Record & empty_
 		return generate_new_test_para_vec_1D(feedback_mode, cwnd, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case ssth:
 		return generate_new_test_para_vec_1D(feedback_mode, ssth, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
-	case srtt:
+	/*case srtt:
 		return generate_new_test_para_vec_1D(feedback_mode, srtt, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case rttvar:
 		return generate_new_test_para_vec_1D(feedback_mode, rttvar, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
@@ -675,8 +677,9 @@ int generate_new_test_para_vec_N(int feedback_mode, struct State_Record & empty_
 		return generate_new_test_para_vec_1D(feedback_mode, state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case prev_state:
 		return generate_new_test_para_vec_1D(feedback_mode, prev_state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
-	//case target:
-		//return generate_new_test_para_vec_1D(feedback_mode, target, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
+	case target:
+		return generate_new_test_para_vec_1D(feedback_mode, target, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
+	*/
 	default:
 		cout << "No matching output type: " << i << endl;
 		exit(-1);
@@ -706,9 +709,9 @@ int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map
 		{
 			cout << "Empty set:" << empty_set.cwnd
 			     << " " << empty_set.ssthresh
-			     << " " << empty_set.srtt
-			     << " " << empty_set.rttvar
-			     << " " << empty_set.tcp_state
+			     //<< " " << empty_set.srtt
+			     //<< " " << empty_set.rttvar
+			     //<< " " << empty_set.tcp_state
 			     //<< " " << empty_set.target
 			     << endl;
 		}
@@ -754,4 +757,5 @@ int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map
 	}
 	return 0;
 }
+
 

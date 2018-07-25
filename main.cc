@@ -93,16 +93,18 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	else if (state == 3) state = 2; // substitute State CWR(2) with State Recovery(3) for state(0-3)
 	average_record.cwnd_aver += (cwnd - average_record.cwnd_aver) * 1.0 / (index_i + 1);
 	average_record.ssth_aver += (ssthresh - average_record.ssth_aver) * 1.0 / (index_i + 1);
-	average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
-	average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
-	average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
-	average_record.prev_state_aver += (Prev_state - average_record.prev_state_aver) * 1.0 / (index_i + 1);
+	//average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
+	//average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
+	//average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
+	//average_record.prev_state_aver += (Prev_state - average_record.prev_state_aver) * 1.0 / (index_i + 1);
 	//average_record.target_aver += (target - average_record.target_aver) * 1.0 / (index_i + 1);
 	index_i++;
 
-	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE && srtt > 0 && srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE && state >= 0 && state < STATE_RANGE && curr_time > 0 )  //ssthresh at least 2
+	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE 
+		//&& srtt > 0 && srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE && state >= 0 && state < STATE_RANGE && curr_time > 0
+		 )  //ssthresh at least 2
 	{
-		struct State_Record tmp(cwnd, ssthresh, srtt, rttvar, state, Prev_state, curr_time);
+		struct State_Record tmp(cwnd, ssthresh, curr_time);
 		insert_state(tmp, trace, map_config, test_para_vec);
 	}
 	
@@ -156,7 +158,7 @@ The function to check map coverage
 */
 int coverage_check(COVG_MAP_VEC& trace){
 
-	if (total_files % 5000 == 0) //Check current coverage every 5000 times
+	if (total_files % 1 == 0) //Check current coverage every 5000 times
 	{
 		
 		double inc_per = (trace[7].coverage_map.size() - prev_coverage_size); //get percentage of map coverage growth
@@ -165,17 +167,17 @@ int coverage_check(COVG_MAP_VEC& trace){
 
 		cal_coverage_AllGrans (covg_map_vec);
 		prev_coverage_size = trace[7].coverage_map.size(); // Defalut focus on 128 size coverage
-		
+		/*
 		// could add a switching time; random could be just 10%, feedback apply different %
 		if (inc_per < COVG_LIMIT_FEEDBACK2) return 3 ;//to switching for feedback 2
 		if (inc_per < COVG_LIMIT_FEEDBACK1) return 2 ;//to switching for feedback 1
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
+		*/
 		
-		/*
 		if (inc_per < INF) return 3 ;//to switching for feedback 2
                 if (inc_per < INF) return 2 ;//to switching for feedback 1
                 if (inc_per < INF) return 1 ;//to switching for random
-		*/
+		
 		system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches"); //used to free system resource
 	}
 
@@ -433,4 +435,5 @@ int main (int argc, char* argv[])
 
 	exit(0);
 }
+
 

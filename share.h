@@ -1,5 +1,5 @@
-/*************************************************************************
-  > File Name: share.h
+/***********************************************************************  
+  >File: share.h
   int  > Author: Wei Sun
   > Mail:sunweiflyus@gmail.com
   > Created Time: Sat 26 Nov 2016 07:53:03 PM CST
@@ -31,27 +31,29 @@ using namespace std;
 #define TRIES_Interval 1
 enum Input_type {speed = 0, loss, alpha, beta, shift, app_speed, Input_type_end};
 enum Input_type_2 {access_speed, access_delay, bottneck_speed, bottneck_delay, router_queue_size, cross_traffic_size};
-enum Output_type {cwnd = 0, ssth, srtt, rttvar, state, prev_state,Output_type_end};
+enum Output_type {cwnd = 0, ssth, 
+					//srtt, rttvar, state, prev_state, target 
+					Output_type_end};
 
 struct single_input_all_output
 {
 	enum Input_type inputType;
 	double _cwnd;
 	double _ssth;
-	double _srtt;
-	double _rttvar;
-	double _state;
-	double _prev_state;
+	//double _srtt;
+	//double _rttvar;
+	//double _state;
+	//double _prev_state;
 	//double _target;
 
 	void clear()
 	{
 		_cwnd = 0;
 		_ssth = 0;
-		_srtt = 0;
-		_rttvar = 0;
-		_state = 0;
-		_prev_state = 0;
+		//_srtt = 0;
+		//_rttvar = 0;
+		//_state = 0;
+		//_prev_state = 0;
 		//_target = 0;
 	}
 
@@ -63,14 +65,14 @@ struct single_input_all_output
 				return _cwnd;
 			case ssth:
 				return _ssth;
-			case srtt:
-				return _srtt;
-			case rttvar:
-				return _rttvar;
-			case state:
-				return _state;
-			case prev_state:
-				return _prev_state;
+			//case srtt:
+				//return _srtt;
+			//case rttvar:
+				//return _rttvar;
+			//case state:
+				//return _state;
+			//case prev_state:
+				//return _prev_state;
 			//case target:
 				//return _target;
 		}
@@ -117,19 +119,20 @@ struct RANGE_INFO
 {
 	unsigned    int cwnd_range;
 	unsigned    int ssth_range;
-	unsigned    int rtt_range;
-	unsigned    int rtvar_range;
-	unsigned    int state_range;
-	unsigned    int prev_state_range;
+	//unsigned    int rtt_range;
+	//unsigned    int rtvar_range;
+	//unsigned    int state_range;
+	//unsigned    int prev_state_range;
 	//unsigned    int target_range;
 	uint64_t    total;
 
 	bool operator==(const RANGE_INFO& other) const
 	{
 		return (cwnd_range == other.cwnd_range && ssth_range == other.ssth_range 
-				&& rtt_range == other.rtt_range && rtvar_range == other.rtvar_range 
-				&& state_range == other.state_range && prev_state_range == other.prev_state_range 
-				&& total == other.total);
+				//&& rtt_range == other.rtt_range && rtvar_range == other.rtvar_range 
+				//&& state_range == other.state_range && prev_state_range == other.prev_state_range 
+				//&& total == other.total
+				);
 	}
 
 	template<class Archive>
@@ -137,10 +140,10 @@ struct RANGE_INFO
 		{
 			ar & cwnd_range;
 			ar & ssth_range;
-			ar & rtt_range;
-			ar & rtvar_range;
-			ar & state_range;
-			ar & prev_state_range;
+			//ar & rtt_range;
+			//ar & rtvar_range;
+			//ar & state_range;
+			//ar & prev_state_range;
 			//ar & target_range;
 			ar & total;
 		}
@@ -150,10 +153,10 @@ struct Record_average
 {
 	double cwnd_aver;
 	double ssth_aver;
-	double rtt_aver;
-	double rttvar_aver;
-	double state_aver;
-	double prev_state_aver;
+	//double rtt_aver;
+	//double rttvar_aver;
+	//double state_aver;
+	//double prev_state_aver;
 	//double target_aver;
 
 	template<class Archive>
@@ -161,18 +164,18 @@ struct Record_average
 		{
 			ar & cwnd_aver;
 			ar & ssth_aver;
-			ar & rtt_aver;
-			ar & rttvar_aver;
-			ar & state_aver;
-			ar & prev_state_aver;
+			//ar & rtt_aver;
+			//ar & rttvar_aver;
+			//ar & state_aver;
+			//ar & prev_state_aver;
 			//ar & target_aver;
 		}
 
 	bool operator==(const Record_average& other) const
 	{
 		return (cwnd_aver == other.cwnd_aver && ssth_aver == other.ssth_aver 
-				&& rtt_aver == other.rtt_aver && rttvar_aver == other.rttvar_aver 
-				&& state_aver == other.state_aver && prev_state_aver == other.prev_state_aver
+				//&& rtt_aver == other.rtt_aver && rttvar_aver == other.rttvar_aver 
+				//&& state_aver == other.state_aver && prev_state_aver == other.prev_state_aver
 				//&& target_aver == other.target_aver
 				);
 	}
@@ -403,19 +406,20 @@ struct State_Record
 	//int counter;//used for counter
 	unsigned int cwnd;
 	unsigned int ssthresh;
-	unsigned int srtt;
-	unsigned int rttvar;
-	unsigned int tcp_state;
-	unsigned int prev_tcp_state;
+	//unsigned int srtt;
+	//unsigned int rttvar;
+	//unsigned int tcp_state;
+	//unsigned int prev_tcp_state;
 	//unsigned int target;
 	uint64_t curr_time;
 
 	bool operator==(const State_Record& other) const
 	{
 
-		return (cwnd == other.cwnd && ssthresh == other.ssthresh && srtt == other.srtt 
-				&& rttvar == other.rttvar && tcp_state == other.tcp_state 
-				&& prev_tcp_state == other.prev_tcp_state && curr_time == other.curr_time 
+		return (cwnd == other.cwnd && ssthresh == other.ssthresh 
+				//&& srtt == other.srtt 
+				//&& rttvar == other.rttvar && tcp_state == other.tcp_state 
+				//&& prev_tcp_state == other.prev_tcp_state && curr_time == other.curr_time 
 			    //&& target == other.target
 			    );
 	}
@@ -424,10 +428,10 @@ struct State_Record
 	{
 		cout << "cwnd:" << cwnd
 			<< " ssth:" << ssthresh
-			<< " srtt:" << srtt
-			<< " rttvar:" << rttvar
-			<< " ca_state:" << tcp_state
-			<< " prev_ca_state:" << prev_tcp_state
+			//<< " srtt:" << srtt
+			//<< " rttvar:" << rttvar
+			//<< " ca_state:" << tcp_state
+			//<< " prev_ca_state:" << prev_tcp_state
 			//<< " bic_target:" << target
 			<< " switching_time:" << curr_time
 			<< "\n";
@@ -438,10 +442,10 @@ struct State_Record
 		{
 			ar & cwnd;
 			ar & ssthresh;
-			ar & srtt;
-			ar & rttvar;
-			ar & tcp_state;
-			ar & prev_tcp_state;
+			//ar & srtt;
+			//ar & rttvar;
+			//ar & tcp_state;
+			//ar & prev_tcp_state;
 			//ar & target;
 			ar & curr_time;
 		}
@@ -450,26 +454,27 @@ struct State_Record
 	{
 		cwnd = 0;
 		ssthresh = 0;
-		srtt = 0;
-		rttvar = 0;
-		tcp_state = 0;
-		prev_tcp_state = 0;
+		//srtt = 0;
+		//rttvar = 0;
+		//tcp_state = 0;
+		//prev_tcp_state = 0;
 		//target = 0;
 		curr_time = 0;
 	}
 
-	State_Record(unsigned int _cwnd, unsigned int _ssthresh, unsigned int _srtt, 
-				unsigned int _rttvar, unsigned int _tcp_state, unsigned int _prev_tcp_state,
+	State_Record(unsigned int _cwnd, unsigned int _ssthresh,
+				//unsigned int _srtt, 
+				//unsigned int _rttvar, unsigned int _tcp_state, unsigned int _prev_tcp_state,
 				//unsigned int _target, 
 				int64_t _curr_time)
 	{
 		cwnd = _cwnd;
 		ssthresh = _ssthresh;
-		srtt = _srtt;
-		rttvar = _rttvar;
-		tcp_state = _tcp_state;
-		prev_tcp_state = _prev_tcp_state;
-		curr_time = _curr_time;
+		//srtt = _srtt;
+		//rttvar = _rttvar;
+		//tcp_state = _tcp_state;
+		//prev_tcp_state = _prev_tcp_state;
+		//curr_time = _curr_time;
 		//target = _target;
 	}
 
@@ -484,7 +489,7 @@ struct State_Record
 			return true;
 		else if  (ssthresh > other.ssthresh)
 			return false;
-
+		/*
 		if (srtt < other.srtt)
 			return true;
 		else if  (srtt > other.srtt)
@@ -504,7 +509,7 @@ struct State_Record
 			return true;
 		else if  (prev_tcp_state > other.prev_tcp_state)
 			return false;
-		/*
+		
 		if (target < other.target)
 			return true;
 		else if  (target > other.target)
@@ -583,4 +588,5 @@ typedef std::priority_queue <PAIR_DISTANCE, PAIR_DISTANCE_VEC, mycomparison2<PAI
 typedef map<struct Normalize_Record, Normal_DISTANCE_PQ> Normalize_Map;
 
 #endif
+
 
