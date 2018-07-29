@@ -85,7 +85,7 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	state = stol(line.substr(ca_left, r_left - 3));
 	srtt = stol(line.substr(r_left, o_left - 3));
 	rttvar = stol(line.substr(o_left, t_left - 3));
-	//target = stol(line.substr(t_left, u_left - 3));
+	target = stol(line.substr(t_left, u_left - 3));
 	curr_time = stol(line.substr(u_left));
 
 	if (ssthresh == 2147483647) return 0; // remove inital slow start
@@ -95,16 +95,17 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	average_record.ssth_aver += (ssthresh - average_record.ssth_aver) * 1.0 / (index_i + 1);
 	//average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
 	//average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
-	//average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
+	average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
 	//average_record.prev_state_aver += (Prev_state - average_record.prev_state_aver) * 1.0 / (index_i + 1);
 	//average_record.target_aver += (target - average_record.target_aver) * 1.0 / (index_i + 1);
 	index_i++;
 
 	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE 
-		//&& srtt > 0 && srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE && state >= 0 && state < STATE_RANGE && curr_time > 0
+		//&& srtt > 0 && srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE 
+		&& state >= 0 && state < STATE_RANGE && curr_time > 0
 		 )  //ssthresh at least 2
 	{
-		struct State_Record tmp(cwnd, ssthresh, curr_time);
+		struct State_Record tmp(cwnd, ssthresh, state, curr_time);
 		insert_state(tmp, trace, map_config, test_para_vec);
 	}
 	

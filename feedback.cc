@@ -75,7 +75,7 @@ int find_empty_area_N(State_Record& empty_state, struct Grans_coverage_map& tmp_
 		tmp.ssthresh = random_range_zero(tmp_map.range_info.ssth_range) + 1;
 		//tmp.srtt = random_range_zero(tmp_map.range_info.rtt_range) + 1;
 		//tmp.rttvar = random_range_zero(tmp_map.range_info.rtvar_range) + 1;
-		//tmp.tcp_state = random_range_zero(tmp_map.range_info.state_range);//0, 1, 2, 3
+		tmp.tcp_state = random_range_zero(tmp_map.range_info.state_range);//0, 1, 2, 3
 		//tmp.prev_tcp_state = random_range_zero(tmp_map.range_info.prev_state_range);//0, 1, 2, 3
 
 		// here empty point needs a mapping operation to be searched in coverage map; as the mapping is done when inserting point into coverage map;
@@ -325,12 +325,12 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 			case rttvar:
 				uprange = covg_map_vec[i].range_info.rtvar_range;
 				index = empty_set.rttvar;
-				break;
+				break;*/
 			case state:
 				uprange = covg_map_vec[i].range_info.state_range;
 				index = empty_set.tcp_state;
 				break;
-			case prev_state:
+			/*case prev_state:
 				uprange = covg_map_vec[i].range_info.prev_state_range;
 				index = empty_set.prev_tcp_state;
 				break;
@@ -366,10 +366,10 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case rttvar:
 					empty_set.rttvar = uprange_i;
 					break;
-				case state:
+				*/case state:
 					empty_set.tcp_state = uprange_i;
 					break;
-				case prev_state:
+				/*case prev_state:
 					empty_set.prev_tcp_state = uprange_i;
 					break;
 				case target:
@@ -414,10 +414,10 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case rttvar:
 					empty_set.rttvar = low_i;
 					break;
-				case state:
+				*/case state:
 					empty_set.tcp_state = low_i;
 					break;
-				case prev_state:
+				/*case prev_state:
 					empty_set.prev_tcp_state = low_i;
 					break;
 				case target:
@@ -673,9 +673,9 @@ int generate_new_test_para_vec_N(int feedback_mode, struct State_Record & empty_
 		return generate_new_test_para_vec_1D(feedback_mode, srtt, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case rttvar:
 		return generate_new_test_para_vec_1D(feedback_mode, rttvar, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
-	case state:
+	*/case state:
 		return generate_new_test_para_vec_1D(feedback_mode, state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
-	case prev_state:
+	/*case prev_state:
 		return generate_new_test_para_vec_1D(feedback_mode, prev_state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case target:
 		return generate_new_test_para_vec_1D(feedback_mode, target, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
@@ -711,7 +711,7 @@ int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map
 			     << " " << empty_set.ssthresh
 			     //<< " " << empty_set.srtt
 			     //<< " " << empty_set.rttvar
-			     //<< " " << empty_set.tcp_state
+			     << " " << empty_set.tcp_state
 			     //<< " " << empty_set.target
 			     << endl;
 		}
