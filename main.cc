@@ -93,17 +93,17 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	else if (state == 3) state = 2; // substitute State CWR(2) with State Recovery(3) for state(0-3)
 	average_record.cwnd_aver += (cwnd - average_record.cwnd_aver) * 1.0 / (index_i + 1);
 	average_record.ssth_aver += (ssthresh - average_record.ssth_aver) * 1.0 / (index_i + 1);
-	//average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
-	//average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
-	average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
+	average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
+	average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
+	//average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
 	//average_record.prev_state_aver += (Prev_state - average_record.prev_state_aver) * 1.0 / (index_i + 1);
 	//average_record.target_aver += (target - average_record.target_aver) * 1.0 / (index_i + 1);
 	index_i++;
 
 	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE 
-		//&& srtt > 0 && srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE 
-		&& state >= 0 && state < STATE_RANGE && curr_time > 0
-		 )  //ssthresh at least 2
+		&& srtt > 0 && srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE 
+		//&& state >= 0 && state < STATE_RANGE 
+		&& curr_time > 0)  //ssthresh at least 2
 	{
 		struct State_Record tmp(cwnd, ssthresh, state, curr_time);
 		insert_state(tmp, trace, map_config, test_para_vec);
@@ -176,8 +176,8 @@ int coverage_check(COVG_MAP_VEC& trace){
 		*/
 		
 		if (inc_per < INF) return 3 ;//to switching for feedback 2
-                if (inc_per < INF) return 2 ;//to switching for feedback 1
-                if (inc_per < INF) return 1 ;//to switching for random
+        if (inc_per < INF) return 2 ;//to switching for feedback 1
+        if (inc_per < INF) return 1 ;//to switching for random
 		
 		system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches"); //used to free system resource
 	}
