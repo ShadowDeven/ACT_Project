@@ -158,12 +158,12 @@ The function to check map coverage
 */
 int coverage_check(COVG_MAP_VEC& trace){
 
-	if (total_files % 1 == 0) //Check current coverage every 5000 times
+	if (total_files % 1000 == 0) //Check current coverage every 5000 times
 	{
 		
 		double inc_per = (trace[7].coverage_map.size() - prev_coverage_size); //get percentage of map coverage growth
 
-		cout << "[Coverage:] every 5000 times:" << trace[7].coverage_map.size()  << " ,prev_coverage_size:" << prev_coverage_size << ", growth %: " << inc_per << " , total files:" << total_files << endl;
+		cout << "[Coverage:] every 1000 times:" << trace[7].coverage_map.size()  << " ,prev_coverage_size:" << prev_coverage_size << ", growth %: " << inc_per << " , total files:" << total_files << endl;
 
 		cal_coverage_AllGrans (covg_map_vec);
 		prev_coverage_size = trace[7].coverage_map.size(); // Defalut focus on 128 size coverage
@@ -172,12 +172,17 @@ int coverage_check(COVG_MAP_VEC& trace){
 		if (inc_per < COVG_LIMIT_FEEDBACK2) return 3 ;//to switching for feedback 2
 		if (inc_per < COVG_LIMIT_FEEDBACK1) return 2 ;//to switching for feedback 1
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
-		*/
+		
 		
 		if (inc_per < INF) return 3 ;//to switching for feedback 2
                 if (inc_per < INF) return 2 ;//to switching for feedback 1
                 if (inc_per < INF) return 1 ;//to switching for random
-		
+		*/
+
+		 if (TOTAL_EXECUTION == INF ) return 3 ;//to switching for feedback 2
+        if (TOTAL_EXECUTION >= 100000 ) return 2 ;//to switching for feedback 1
+        if (TOTAL_EXECUTION < 100000 ) return 1 ;		
+
 		system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches"); //used to free system resource
 	}
 
