@@ -63,7 +63,7 @@ int insert_state(struct State_Record& tmp, COVG_MAP_VEC& map_vec, Config_Map& co
 		//int rttvar = (tmp.rttvar - 1) / granularity;
 		//int state = tmp.tcp_state ; // no grain for states
 		//int prev_state = tmp.prev_tcp_state ; // no grain for states
-		struct State_Record tmp_cube(cwnd, ssthresh, srtt, rttvar, 0);
+		struct State_Record tmp_cube(cwnd, ssthresh, srtt, 0);
 		Cube_State_Map::iterator it = map_vec[i].coverage_map.find(tmp_cube);
 
 		if (it != map_vec[i].coverage_map.end())

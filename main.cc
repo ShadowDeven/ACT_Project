@@ -105,7 +105,7 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 		//&& state >= 0 && state < STATE_RANGE 
 		&& curr_time > 0)  //ssthresh at least 2
 	{
-		struct State_Record tmp(cwnd, ssthresh, srtt, rttvar, curr_time);
+		struct State_Record tmp(cwnd, ssthresh, srtt,curr_time);
 		insert_state(tmp, trace, map_config, test_para_vec);
 	}
 	
