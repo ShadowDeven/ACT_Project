@@ -32,7 +32,7 @@ using namespace std;
 enum Input_type {speed = 0, loss, alpha, beta, shift, app_speed, Input_type_end};
 enum Input_type_2 {access_speed, access_delay, bottneck_speed, bottneck_delay, router_queue_size, cross_traffic_size};
 enum Output_type {cwnd = 0, ssth, 
-					srtt,
+					//srtt,
 					//rttvar, 
 					//state, prev_state, target,
 					 Output_type_end};
@@ -42,7 +42,7 @@ struct single_input_all_output
 	enum Input_type inputType;
 	double _cwnd;
 	double _ssth;
-	double _srtt;
+	//double _srtt;
 	//double _rttvar;
 	//double _state;
 	//double _prev_state;
@@ -52,7 +52,7 @@ struct single_input_all_output
 	{
 		_cwnd = 0;
 		_ssth = 0;
-		_srtt = 0;
+		//_srtt = 0;
 		//_rttvar = 0;
 		//_state = 0;
 		//_prev_state = 0;
@@ -67,8 +67,8 @@ struct single_input_all_output
 				return _cwnd;
 			case ssth:
 				return _ssth;
-			case srtt:
-				return _srtt;
+			//case srtt:
+				//return _srtt;
 			//case rttvar:
 				//return _rttvar;
 			//case state:
@@ -121,7 +121,7 @@ struct RANGE_INFO
 {
 	unsigned    int cwnd_range;
 	unsigned    int ssth_range;
-	unsigned    int rtt_range;
+	//unsigned    int rtt_range;
 	//unsigned    int rtvar_range;
 	//unsigned    int state_range;
 	//unsigned    int prev_state_range;
@@ -131,7 +131,7 @@ struct RANGE_INFO
 	bool operator==(const RANGE_INFO& other) const
 	{
 		return (cwnd_range == other.cwnd_range && ssth_range == other.ssth_range 
-				&& rtt_range == other.rtt_range //&& rtvar_range == other.rtvar_range 
+				//&& rtt_range == other.rtt_range //&& rtvar_range == other.rtvar_range 
 				//&& state_range == other.state_range 
 				//&& prev_state_range == other.prev_state_range 
 				&& total == other.total
@@ -143,7 +143,7 @@ struct RANGE_INFO
 		{
 			ar & cwnd_range;
 			ar & ssth_range;
-			ar & rtt_range;
+			//ar & rtt_range;
 			//ar & rtvar_range;
 			//ar & state_range;
 			//ar & prev_state_range;
@@ -156,7 +156,7 @@ struct Record_average
 {
 	double cwnd_aver;
 	double ssth_aver;
-	double rtt_aver;
+	//double rtt_aver;
 	//double rttvar_aver;
 	//double state_aver;
 	//double prev_state_aver;
@@ -167,7 +167,7 @@ struct Record_average
 		{
 			ar & cwnd_aver;
 			ar & ssth_aver;
-			ar & rtt_aver;
+			//ar & rtt_aver;
 			//ar & rttvar_aver;
 			//ar & state_aver;
 			//ar & prev_state_aver;
@@ -177,7 +177,7 @@ struct Record_average
 	bool operator==(const Record_average& other) const
 	{
 		return (cwnd_aver == other.cwnd_aver && ssth_aver == other.ssth_aver 
-				&& rtt_aver == other.rtt_aver //&& rttvar_aver == other.rttvar_aver 
+				//&& rtt_aver == other.rtt_aver //&& rttvar_aver == other.rttvar_aver 
 				//&& state_aver == other.state_aver 
 				//&& prev_state_aver == other.prev_state_aver
 				//&& target_aver == other.target_aver
@@ -410,7 +410,7 @@ struct State_Record
 	//int counter;//used for counter
 	unsigned int cwnd;
 	unsigned int ssthresh;
-	unsigned int srtt;
+	//unsigned int srtt;
 	//unsigned int rttvar;
 	//unsigned int tcp_state;
 	//unsigned int prev_tcp_state;
@@ -421,7 +421,7 @@ struct State_Record
 	{
 
 		return (cwnd == other.cwnd && ssthresh == other.ssthresh 
-				&& srtt == other.srtt //&& rttvar == other.rttvar 
+				//&& srtt == other.srtt //&& rttvar == other.rttvar 
 				//&& tcp_state == other.tcp_state 
 				//&& prev_tcp_state == other.prev_tcp_state 
 				&& curr_time == other.curr_time 
@@ -433,7 +433,7 @@ struct State_Record
 	{
 		cout << "cwnd:" << cwnd
 			<< " ssth:" << ssthresh
-			<< " srtt:" << srtt
+			//<< " srtt:" << srtt
 			//<< " rttvar:" << rttvar
 			//<< " ca_state:" << tcp_state
 			//<< " prev_ca_state:" << prev_tcp_state
@@ -447,7 +447,7 @@ struct State_Record
 		{
 			ar & cwnd;
 			ar & ssthresh;
-			ar & srtt;
+			//ar & srtt;
 			//ar & rttvar;
 			//ar & tcp_state;
 			//ar & prev_tcp_state;
@@ -459,7 +459,7 @@ struct State_Record
 	{
 		cwnd = 0;
 		ssthresh = 0;
-		srtt = 0;
+		//srtt = 0;
 		//rttvar = 0;
 		//tcp_state = 0;
 		//prev_tcp_state = 0;
@@ -468,7 +468,7 @@ struct State_Record
 	}
 
 	State_Record(unsigned int _cwnd, unsigned int _ssthresh,
-				unsigned int _srtt, 
+				//unsigned int _srtt, 
 				//unsigned int _rttvar, 
 				//unsigned int _tcp_state, 
 				//unsigned int _prev_tcp_state,
@@ -477,7 +477,7 @@ struct State_Record
 	{
 		cwnd = _cwnd;
 		ssthresh = _ssthresh;
-		srtt = _srtt;
+		//srtt = _srtt;
 		//rttvar = _rttvar;
 		//tcp_state = _tcp_state;
 		//prev_tcp_state = _prev_tcp_state;
@@ -496,7 +496,7 @@ struct State_Record
 			return true;
 		else if  (ssthresh > other.ssthresh)
 			return false;
-		
+		/*
 		if (srtt < other.srtt)
 			return true;
 		else if  (srtt > other.srtt)
