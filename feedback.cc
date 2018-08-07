@@ -73,7 +73,7 @@ int find_empty_area_N(State_Record& empty_state, struct Grans_coverage_map& tmp_
 	{
 		tmp.cwnd = random_range_zero(tmp_map.range_info.cwnd_range) + 1;// 0 - 1023 in coverage map
 		tmp.ssthresh = random_range_zero(tmp_map.range_info.ssth_range) + 1;
-		tmp.srtt = random_range_zero(tmp_map.range_info.rtt_range) + 1;
+		//tmp.srtt = random_range_zero(tmp_map.range_info.rtt_range) + 1;
 		//tmp.rttvar = random_range_zero(tmp_map.range_info.rtvar_range) + 1;
 		//tmp.tcp_state = random_range_zero(tmp_map.range_info.state_range);//0, 1, 2, 3
 		//tmp.prev_tcp_state = random_range_zero(tmp_map.range_info.prev_state_range);//0, 1, 2, 3
@@ -317,7 +317,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				uprange = covg_map_vec[i].range_info.ssth_range;
 				index = empty_set.ssthresh;
 				break;
-			case srtt:
+			/*case srtt:
 				uprange = covg_map_vec[i].range_info.rtt_range;
 				index = empty_set.srtt;
 				break;
@@ -343,7 +343,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				exit(-1);
 			}
 
-			cout << "uprange:" << uprange << " lowrange:" << lowrange << endl;
+			//cout << "uprange:" << uprange << " lowrange:" << lowrange << endl;
 			
 			
 			// to looking for upbound state
@@ -358,7 +358,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case ssth:
 					empty_set.ssthresh = uprange_i;
 					break;
-				case srtt:
+				/*case srtt:
 					empty_set.srtt = uprange_i;
 					break;
 				/*case rttvar:
@@ -405,7 +405,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case ssth:
 					empty_set.ssthresh = low_i;
 					break;
-				case srtt:
+				/*case srtt:
 					empty_set.srtt = low_i;
 					break;
 				/*case rttvar:
@@ -666,7 +666,7 @@ int generate_new_test_para_vec_N(int feedback_mode, struct State_Record & empty_
 		return generate_new_test_para_vec_1D(feedback_mode, cwnd, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case ssth:
 		return generate_new_test_para_vec_1D(feedback_mode, ssth, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
-	case srtt:
+	/*case srtt:
 		return generate_new_test_para_vec_1D(feedback_mode, srtt, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	/*case rttvar:
 		return generate_new_test_para_vec_1D(feedback_mode, rttvar, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
@@ -706,7 +706,7 @@ int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map
 		{
 			cout << "Empty set:" << empty_set.cwnd
 			     << " " << empty_set.ssthresh
-			     << " " << empty_set.srtt
+			     //<< " " << empty_set.srtt
 			     //<< " " << empty_set.rttvar
 			     //<< " " << empty_set.tcp_state
 			     //<< " " << empty_set.target
@@ -732,20 +732,16 @@ int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map
 				snprintf (mvcmd, 256, "/tmp/output/%d/messages", TOTAL_EXECUTION);
 				if(read_from_file(mvcmd, map_vec, map_config, new_test_para_vec[m])==0)
 					res = coverage_check(map_vec);
+				else
+					break;
 				snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_feedback%d/config_%d", feedback_mode, TOTAL_EXECUTION);
 				total_folder_feedback++;
 				system(mvcmd);
 
-				if (res >= 2 && feedback_mode == 1)
-				{
-					cout << " feedback1 switching at: " << TOTAL_EXECUTION << endl;
-					return -1;
-				}
-
-				if (res == 3 && feedback_mode == 2)
-				{
-					cout << " feedback2 switching at: " << TOTAL_EXECUTION << endl;
-					return -1;
+				if (res == 1)
+                                {
+                                        cout << " feedback" << feedback_mode << " switching at: " << TOTAL_EXECUTION << endl;
+                                        return -1;
 				}
 				
 			}

@@ -93,7 +93,7 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	else if (state == 3) state = 2; // substitute State CWR(2) with State Recovery(3) for state(0-3)
 	average_record.cwnd_aver += (cwnd - average_record.cwnd_aver) * 1.0 / (index_i + 1);
 	average_record.ssth_aver += (ssthresh - average_record.ssth_aver) * 1.0 / (index_i + 1);
-	average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
+	//average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
 	//average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
 	//average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
 	//average_record.prev_state_aver += (Prev_state - average_record.prev_state_aver) * 1.0 / (index_i + 1);
@@ -101,11 +101,11 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	index_i++;
 
 	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE 
-		&& srtt > 0 && srtt <= RTT_RANGE //&& rttvar > 0 && rttvar <= RTVAR_RANGE 
+		//&& srtt > 0 && srtt <= RTT_RANGE //&& rttvar > 0 && rttvar <= RTVAR_RANGE 
 		//&& state >= 0 && state < STATE_RANGE 
 		&& curr_time > 0)  //ssthresh at least 2
 	{
-		struct State_Record tmp(cwnd, ssthresh, srtt,curr_time);
+		struct State_Record tmp(cwnd, ssthresh, curr_time);
 		insert_state(tmp, trace, map_config, test_para_vec);
 	}
 	
@@ -114,12 +114,15 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 }
 
 //about 1.5 percent of  2048 total size (given 128 size granularity)
-#define COVG_LIMIT_RANDOM  30*8
-#define COVG_LIMIT_FEEDBACK1  30*8
-#define COVG_LIMIT_FEEDBACK2  30*8
+//#define COVG_LIMIT_RANDOM  20
+//#define COVG_LIMIT_FEEDBACK1  20
+#define GROWTH_SSH 2000
+//#define COVG_LIMIT_FEEDBACK2  20
+#define TOLERANCE 5
 #define INF 99999999999
 int total_files = 0;
-int prev_coverage_size = 1;
+int prev_coverage_size = 0;
+int re_counter = 0;
 
 /*
 This function is used to process ns3-dce traces and decide to switch feedbacks
@@ -159,29 +162,42 @@ The function to check map coverage
 */
 int coverage_check(COVG_MAP_VEC& trace){
 
-	if (total_files % 1 == 0) //Check current coverage every 5000 times
+	if (total_files % 1000 == 0) //Check current coverage every 5000 times
 	{
 		
-		double inc_per = (trace[7].coverage_map.size() - prev_coverage_size); //get percentage of map coverage growth
+		double inc_per = trace[0].coverage_map.size() - prev_coverage_size; //get percentage of map coverage growth
 
-		cout << "[Coverage:] every 5000 times:" << trace[7].coverage_map.size()  << " ,prev_coverage_size:" << prev_coverage_size << ", growth %: " << inc_per << " , total files:" << total_files << endl;
+		cout << "[Coverage:] every 1000 times:" << trace[0].coverage_map.size()  << " ,prev_coverage_size:" << prev_coverage_size << ", growth num count: " << inc_per << " , total files:" << total_files << endl;
 
 		cal_coverage_AllGrans (covg_map_vec);
-		prev_coverage_size = trace[7].coverage_map.size(); // Defalut focus on 128 size coverage
+		prev_coverage_size = trace[0].coverage_map.size(); // Defalut focus on 128 size coverage
 		/*
 		// could add a switching time; random could be just 10%, feedback apply different %
 		if (inc_per < COVG_LIMIT_FEEDBACK2) return 3 ;//to switching for feedback 2
 		if (inc_per < COVG_LIMIT_FEEDBACK1) return 2 ;//to switching for feedback 1
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
+	
+		if (TOTAL_EXECUTION > 25 && TOTAL_EXECUTION < 35) return 1 ;//to switching for feedback 2
+		 if (TOTAL_EXECUTION > 15 && TOTAL_EXECUTION < 25) return 1 ;//to switching for feedback 1
+        	if (TOTAL_EXECUTION > 5 && TOTAL_EXECUTION < 15 ) return 1 ;//to switching for random
 		*/
-		
-		if (inc_per < INF) return 3 ;//to switching for feedback 2
- 	        if (inc_per < INF) return 2 ;//to switching for feedback 1
-       		if (inc_per < INF) return 1 ;//to switching for random
+	
+		if (inc_per < GROWTH_SSH) {
+			
+			if(re_counter<5){
+				re_counter++;
+			}else{
+				re_counter = 0;
+				return 1;
+			}
+		}else{
+			re_counter = 0;
+		}
 		
 		system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches"); //used to free system resource
 	}
-
+	
+	return 0;
 	/*
 	//Another way is to switch according to execution times
 	if (TOTAL_EXECUTION >= 55000 ) return 3 ;//to switching for feedback 2
@@ -359,7 +375,7 @@ int purely_random_testing(int mode)
 	{
 		cout << "the number of executions " << TOTAL_EXECUTION << endl;
 		res = try_per_config(i, mode);
-		if (res >= 1)// random testing saturated
+		if (res >  0)// random testing saturated
 		{
 			cout << "random switching at: " << TOTAL_EXECUTION << endl;
 			break;
@@ -413,14 +429,14 @@ int main (int argc, char* argv[])
 	pearson_corrleation(input_output_relation, input_output_map); // To get pearson corrleation
 
 	cout << "[Purely Random] 5d coverage:" << endl;
-	cal_coverage_AllGrans(covg_map_vec);
+	//cal_coverage_AllGrans(covg_map_vec);
 
 	cmd_init_feedback();
 
 	cout << "[5D] Begin feedback 1: ";
 	feedback_random_N(1, covg_map_vec, config_map, input_output_map);
 
-	cal_coverage_AllGrans(covg_map_vec);
+	//cal_coverage_AllGrans(covg_map_vec);
 
 	system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches");
 
