@@ -167,7 +167,7 @@ int coverage_check(COVG_MAP_VEC& trace){
 		
 		double inc_per = trace[0].coverage_map.size() - prev_coverage_size; //get percentage of map coverage growth
 
-		cout << "[Coverage:] every 1000 times:" << trace[0].coverage_map.size()  << " ,prev_coverage_size:" << prev_coverage_size << ", growth num count: " << inc_per << " , total files:" << total_files << endl;
+		cout << "Every 1000 times:" << trace[0].coverage_map.size()  << " ,prev_coverage_size:" << prev_coverage_size << ", growth num count: " << inc_per << " , total files:" << total_files << endl;
 
 		cal_coverage_AllGrans (covg_map_vec);
 		prev_coverage_size = trace[0].coverage_map.size(); // Defalut focus on 128 size coverage
@@ -245,7 +245,7 @@ void prepare_before_config_vec(vector<struct Test_Parems>& vec_test_para)
 	}
 	else
 	{
-		cout << "canot output config vec\n";
+		cout << "[Error] Canot output config vec!" << endl;
 		return ;
 	}
 
@@ -373,11 +373,11 @@ int purely_random_testing(int mode)
 	int i = 1;
 	while(1)
 	{
-		cout << "the number of executions " << TOTAL_EXECUTION << endl;
+		cout << "The number of executions " << TOTAL_EXECUTION << endl;
 		res = try_per_config(i, mode);
 		if (res >  0)// random testing saturated
 		{
-			cout << "random switching at: " << TOTAL_EXECUTION << endl;
+			cout << "Random switching at: " << TOTAL_EXECUTION << endl;
 			break;
 		}
 		i++;
@@ -415,7 +415,7 @@ int main (int argc, char* argv[])
 	freopen("log.txt", "w", stdout); // Log file will generated to log.txt
 	MAIL_MODE = 0; //default is disable
 	random_init(); // init for random generator
-	cout << "free up system memory for this experiment !\n";
+	//cout << "free up system memory for this experiment !\n";
 	system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches");
 
 	//if (MAIL_MODE) system ("sudo mail -s \"Experiment Begin Mention \" xxx@example.com < /dev/null ");
@@ -423,28 +423,30 @@ int main (int argc, char* argv[])
 	//char cmd[512];
 
 	init_coverage_map_vec();
-	cout << "purely random start !!" << endl ;
+	cout << "System initiation succeed, ACT starts!" << endl;
+	cout << "Search guide: [Stage] [Coverage] [Caution] [Error]" << endl;
+	cout << "[Stage] Purely random: " << endl;
 	cmd_init_random();
 	purely_random_testing(0);
 	pearson_corrleation(input_output_relation, input_output_map); // To get pearson corrleation
 
-	cout << "[Purely Random] 5d coverage:" << endl;
+	//cout << "[Purely Random] 5d coverage:" << endl;
 	//cal_coverage_AllGrans(covg_map_vec);
 
 	cmd_init_feedback();
 
-	cout << "[5D] Begin feedback 1: ";
+	cout << "[Stage] Begin feedback 1: " << endl;
 	feedback_random_N(1, covg_map_vec, config_map, input_output_map);
 
 	//cal_coverage_AllGrans(covg_map_vec);
 
 	system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches");
 
-	cout << "[5D] Begin feedback 2: ";
+	cout << "[Stage] Begin feedback 2: ";
 	feedback_random_N(2, covg_map_vec, config_map, input_output_map);
 
 	//After feedback coverage
-	cout << "[After Feedback] 5d coverage:" << endl;
+	cout << "[Stage] Finish succeed!" << endl;
 	cout << "TOTAL_EXECUTION:" << TOTAL_EXECUTION << endl;
 	cal_coverage_AllGrans(covg_map_vec);
 

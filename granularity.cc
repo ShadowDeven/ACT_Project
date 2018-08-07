@@ -11,7 +11,7 @@
 #include <algorithm>
 int cal_coverage_AllGrans (COVG_MAP_VEC& map_vec)
 {
-	cout << "map_vec.size:" << map_vec.size() << endl;
+	cout << "[Coverage] map_vec.size:" << map_vec.size() << endl;
 	for (int i = 0; i < map_vec.size(); i++)
 	{
 		double coverage = map_vec[i].coverage_map.size() * 1.0 /

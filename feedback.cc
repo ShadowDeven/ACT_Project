@@ -112,7 +112,7 @@ int get_input_output_relation(Test_Parems_Limite& test_limit, Output_type output
 	INPUT_OUT_MAP::iterator it = input_output_map.find(pair_enum);
 	if (it == input_output_map.end())
 	{
-		cout << "Error Speed no correleation found !!!\n";
+		cout << "[Error] Speed no correleation found !!!\n";
 		//exit(-1);
 	}
 
@@ -138,7 +138,7 @@ int get_input_output_relation(Test_Parems_Limite& test_limit, Output_type output
 	it = input_output_map.find(pair_enum);
 	if (it == input_output_map.end())
 	{
-		cout << "Error Loss no correleation found !!!\n";
+		cout << "[Error] Loss no correleation found !!!\n";
 		exit(-1);
 	}
 	if ( it-> second == 1)
@@ -164,7 +164,7 @@ int get_input_output_relation(Test_Parems_Limite& test_limit, Output_type output
 
 	if (it == input_output_map.end())
 	{
-		cout << "Error alpha no correleation found !!!\n";
+		cout << "[Error] alpha no correleation found !!!\n";
 		exit(-1);
 	}
 
@@ -191,7 +191,7 @@ int get_input_output_relation(Test_Parems_Limite& test_limit, Output_type output
 
 	if (it == input_output_map.end())
 	{
-		cout << "Error beta no correleation found !!!\n";
+		cout << "[Error] beta no correleation found !!!\n";
 		//exit(-1);
 	}
 
@@ -218,7 +218,7 @@ int get_input_output_relation(Test_Parems_Limite& test_limit, Output_type output
 
 	if (it == input_output_map.end())
 	{
-		cout << "Error shift no correleation found !!!\n";
+		cout << "[Error] shift no correleation found !!!\n";
 		//exit(-1);
 	}
 
@@ -245,7 +245,7 @@ int get_input_output_relation(Test_Parems_Limite& test_limit, Output_type output
 
 	if (it == input_output_map.end())
 	{
-		cout << "Error app_speed no correleation found !!!\n";
+		cout << "[Error] app_speed no correleation found !!!\n";
 		//exit(-1);
 	}
 
@@ -339,7 +339,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				break;
 				*/
 			default:
-				cout << "No matching output type: " <<output<< endl;
+				cout << "[Error] No matching output type: " <<output<< endl;
 				exit(-1);
 			}
 
@@ -374,7 +374,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 					empty_set.target = uprange_i;
 					break; */
 				default:
-					cout << "No matching output type: " <<output<< endl;
+					cout << "[Error] No matching output type: " <<output<< endl;
 					exit(-1);
 				}
 				if (DEBUG)
@@ -421,7 +421,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 					empty_set.target = low_i;
 					break; */
 				default:
-					cout << "No matching output type: " <<output<< endl;
+					cout << "[Error] No matching output type: " <<output<< endl;
 					exit(-1);
 
 				}
@@ -450,9 +450,9 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 			if (!lowbound_limit || !upbound_limit)
 			{
 				if (lowbound_limit || upbound_limit)	
-					cout << "[One Limit] FIND candidate points at granularity:" << covg_map_vec[i].granularity << endl;
+					cout << "[Limit] Find candidate points at granularity:" << covg_map_vec[i].granularity << endl;
 				else
-					cout << "[No Limit] FIND candidate points at granularity:" << covg_map_vec[i].granularity << endl;
+					cout << "[Limit] Find candidate points at granularity:" << covg_map_vec[i].granularity << endl;
 				
 				break;
 			};
@@ -465,7 +465,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 	if (upbound_limit && lowbound_limit)
 	{
 		//if(DEBUG)
-		cout << "cannot find candidate points!";
+		cout << "[Limit] Cannot find candidate points!" << endl;
 		return -1;
 	}
 
@@ -678,19 +678,23 @@ int generate_new_test_para_vec_N(int feedback_mode, struct State_Record & empty_
 		return generate_new_test_para_vec_1D(feedback_mode, target, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	*/
 	default:
-		cout << "No matching output type: " << i << endl;
+		cout << "[Error] No matching output type, check generate_new_test_para_vec_N" << endl;
 		exit(-1);
 	}
 
 	return 0;//should not execute this
 }
 
-int total_folder_feedback = 0 ;
+//int total_folder_feedback = 0;
+
+
 int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map_config, INPUT_OUT_MAP & input_output_map)
 {
 	char mvcmd[256] = {0};
 	struct State_Record empty_set;
 	int res;
+	int error_bit = 0;
+	int error_counter = 0;
 
 	vector<vector<struct Test_Parems> > new_test_para_vec;
 	while (true)
@@ -698,50 +702,68 @@ int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map
 		new_test_para_vec.clear();
 		if (find_empty_area_N(empty_set, map_vec[0]) == -1)//to find an empty state given granularity 1
 		{
-			if (DEBUG) cout << "After feedback(Saturated cannot find empty area):" ;
-			return -1 ; // saturated almost impossible for 5 d
+			cout << "[Caution] Empty area search fails, saturation occurs!" << endl;
+			cal_coverage_AllGrans(map_vec);
+			exit(-1); // saturated almost impossible for 5 d
 		}
-
-		if (DEBUG)
-		{
-			cout << "Empty set:" << empty_set.cwnd
-			     << " " << empty_set.ssthresh
-			     //<< " " << empty_set.srtt
-			     //<< " " << empty_set.rttvar
-			     //<< " " << empty_set.tcp_state
-			     //<< " " << empty_set.target
-			     << endl;
-		}
-
-		res = generate_new_test_para_vec_N(feedback_mode, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 		
-		if (res == -1) continue;//cannot generate new test inputs, for feedback 2
+		for (int i=0; i<100; i++)
+		{	
+			error_bit = 0;
+			if(generate_new_test_para_vec_N(feedback_mode, empty_set, map_vec, map_config, new_test_para_vec, input_output_map) == 0)
+				break;
+			error_bit = 1;
+			
+		}
+		
+		if (error_bit == 1){
+			cout << "[Error] Could not find candidate pairs for 100 times, move to next stage!" << endl;
+			error_bit = 0;
+			break;
+		}
+		
 
 		for (unsigned int m = 0; m < TRIES_Interval && m < new_test_para_vec.size(); m++)
 		{
 			TOTAL_EXECUTION++;
 			prepare_before_config_vec(new_test_para_vec[m]);
-			res = execute_ns3_2(0);
 			
-			if (res == -1 )
-			{
+			if (execute_ns3_2(0) == -1 ) //ns3 fails
+			{	
+				cout << "[Caution] Execution " << TOTAL_EXECUTION << " fails" << error_counter+1 << "times;" << endl;
 				TOTAL_EXECUTION--; //offsetting this execution
-				break; //for exception
+				error_counter++;
+				if (error_counter == 3)
+				{
+					cout << "[Error] NS3 execution fails, move to the next stage!" << endl;
+					error_counter = 0;
+					return 0; //for exception
+				}
+				else
+				{
+					m--;
+					continue;
+				}
 			}
-			else{
+			else
+			{
 				snprintf (mvcmd, 256, "/tmp/output/%d/messages", TOTAL_EXECUTION);
 				if(read_from_file(mvcmd, map_vec, map_config, new_test_para_vec[m])==0)
-					res = coverage_check(map_vec);
-				else
-					break;
-				snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_feedback%d/config_%d", feedback_mode, TOTAL_EXECUTION);
-				total_folder_feedback++;
-				system(mvcmd);
+				{
+					snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_feedback%d/config_%d", feedback_mode, TOTAL_EXECUTION);
+					//total_folder_feedback++;
+					system(mvcmd);
 
-				if (res == 1)
-                                {
-                                        cout << " feedback" << feedback_mode << " switching at: " << TOTAL_EXECUTION << endl;
-                                        return -1;
+					if (coverage_check(map_vec) == 1)
+                	{
+                    	cout << " [Switch] Feedback" << feedback_mode << " switching at: " << TOTAL_EXECUTION << endl;
+                    	return 0;
+					}
+				}
+				else
+				{
+					cont << "[Error] Read output file fails!" << endl;
+					exit(-1);
 				}
 				
 			}
