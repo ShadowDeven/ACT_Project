@@ -95,17 +95,17 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	average_record.ssth_aver += (ssthresh - average_record.ssth_aver) * 1.0 / (index_i + 1);
 	//average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
 	//average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
-	//average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
+	average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
 	//average_record.prev_state_aver += (Prev_state - average_record.prev_state_aver) * 1.0 / (index_i + 1);
 	//average_record.target_aver += (target - average_record.target_aver) * 1.0 / (index_i + 1);
 	index_i++;
 
 	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE 
 		//&& srtt > 0 && srtt <= RTT_RANGE //&& rttvar > 0 && rttvar <= RTVAR_RANGE 
-		//&& state >= 0 && state < STATE_RANGE 
+		&& state >= 0 && state < STATE_RANGE 
 		&& curr_time > 0)  //ssthresh at least 2
 	{
-		struct State_Record tmp(cwnd, ssthresh, curr_time);
+		struct State_Record tmp(cwnd, ssthresh, state, curr_time);
 		insert_state(tmp, trace, map_config, test_para_vec);
 	}
 	
@@ -162,7 +162,7 @@ The function to check map coverage
 */
 int coverage_check(COVG_MAP_VEC& trace){
 
-	if (total_files % 100 == 0) //Check current coverage every 5000 times
+	if (total_files % 10 == 0) //Check current coverage every 5000 times
 	{
 		
 		double inc_per = trace[0].coverage_map.size() - prev_coverage_size; //get percentage of map coverage growth
@@ -177,9 +177,9 @@ int coverage_check(COVG_MAP_VEC& trace){
 		if (inc_per < COVG_LIMIT_FEEDBACK1) return 2 ;//to switching for feedback 1
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
 		*/
-		//if (TOTAL_EXECUTION > 595 && TOTAL_EXECUTION < 605) return 1 ;//to switching for feedback 2
-		if (TOTAL_EXECUTION > 595 && TOTAL_EXECUTION < 605) return 1 ;//to switching for feedback 1
-        	if (TOTAL_EXECUTION >195  && TOTAL_EXECUTION < 205 ) return 1 ;//to switching for random
+		if (TOTAL_EXECUTION > 35 && TOTAL_EXECUTION < 45) return 1 ;//to switching for feedback 2
+		if (TOTAL_EXECUTION > 25 && TOTAL_EXECUTION < 35) return 1 ;//to switching for feedback 1
+        if (TOTAL_EXECUTION > 15  && TOTAL_EXECUTION < 25 ) return 1 ;//to switching for random
 		
 		/*
 		if (inc_per < INF) {
@@ -442,10 +442,10 @@ int main (int argc, char* argv[])
 	//cal_coverage_AllGrans(covg_map_vec);
 
 	system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches");
-	/*
+	
 	cout << "[Stage] Begin feedback 2: " << endl;
 	feedback_random_N(2, covg_map_vec, config_map, input_output_map);
-	*/
+	
 	//After feedback coverage
 	cout << "[Stage] Finish succeed!" << endl;
 	cout << "TOTAL_EXECUTION:" << TOTAL_EXECUTION << endl;
