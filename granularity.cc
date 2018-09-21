@@ -63,8 +63,9 @@ int insert_state(struct State_Record& tmp, COVG_MAP_VEC& map_vec, Config_Map& co
 		//int rttvar = (tmp.rttvar - 1) / granularity;
 		int state = tmp.tcp_state ; // no grain for states
 		//int prev_state = tmp.prev_tcp_state ; // no grain for state
-
-		struct State_Record tmp_cube(cwnd, ssthresh, 0);
+		
+		//TO DO
+		struct State_Record tmp_cube(cwnd, ssthresh, state, 0);
 		Cube_State_Map::iterator it = map_vec[i].coverage_map.find(tmp_cube);
 
 		if (it != map_vec[i].coverage_map.end())
@@ -137,9 +138,11 @@ int cal_range (struct RANGE_INFO & range_info, int granularity)
 	//range_info.rtvar_range = granularity >= RTVAR_RANGE ? 1 : RTVAR_RANGE / granularity;
 	range_info.state_range = STATE_RANGE; // / (tcp_state_granularity); no grain for states
 	//range_info.prev_state_range = STATE_RANGE;
+	//TO DO
 	range_info.total = range_info.cwnd_range * range_info.ssth_range;
 			//* range_info.rtt_range //* range_info.rtvar_range;
-		 	//* range_info.state_range * range_info.prev_state_range;
+		 	* range_info.state_range;
+		 	//* range_info.prev_state_range;
 	return 0;
 }
 
