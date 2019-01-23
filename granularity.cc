@@ -61,7 +61,7 @@ int insert_state(struct State_Record& tmp, COVG_MAP_VEC& map_vec, Config_Map& co
 		int ssthresh = (tmp.ssthresh - 1) / granularity;
 		//int srtt = (tmp.srtt - 1) / granularity;
 		//int rttvar = (tmp.rttvar - 1) / granularity;
-		int state = tmp.tcp_state ; // no grain for states
+		//int state = tmp.tcp_state ; // no grain for states
 		//int prev_state = tmp.prev_tcp_state ; // no grain for state
 		
 		//TO DO
