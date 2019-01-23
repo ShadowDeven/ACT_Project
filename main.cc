@@ -116,9 +116,9 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 //about 1.5 percent of  2048 total size (given 128 size granularity)
 //#define COVG_LIMIT_RANDOM  20
 //#define COVG_LIMIT_FEEDBACK1  20
-#define GROWTH_SSH 2000
+#define GROWTH_SSH 1000
 //#define COVG_LIMIT_FEEDBACK2  20
-#define TOLERANCE 5
+#define TOLERANCE 3
 #define INF 99999999999
 int total_files = 0;
 int prev_coverage_size = 0;
@@ -162,7 +162,7 @@ The function to check map coverage
 */
 int coverage_check(COVG_MAP_VEC& trace){
 
-	if (total_files % 10 == 0) //Check current coverage every 5000 times
+	if (total_files % 100 == 0) //Check current coverage every 5000 times
 	{
 		
 		double inc_per = trace[0].coverage_map.size() - prev_coverage_size; //get percentage of map coverage growth
@@ -176,17 +176,18 @@ int coverage_check(COVG_MAP_VEC& trace){
 		if (inc_per < COVG_LIMIT_FEEDBACK2) return 3 ;//to switching for feedback 2
 		if (inc_per < COVG_LIMIT_FEEDBACK1) return 2 ;//to switching for feedback 1
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
-		*/
-		if (TOTAL_EXECUTION > 35 && TOTAL_EXECUTION < 45) return 1 ;//to switching for feedback 2
-		if (TOTAL_EXECUTION > 25 && TOTAL_EXECUTION < 35) return 1 ;//to switching for feedback 1
-        if (TOTAL_EXECUTION > 15  && TOTAL_EXECUTION < 25 ) return 1 ;//to switching for random
+	*/
+		if (TOTAL_EXECUTION > 10995 && TOTAL_EXECUTION < 15995) return 1 ;//to switching for feedback 2
+		if (TOTAL_EXECUTION > 5995 && TOTAL_EXECUTION < 6005) return 1 ;//to switching for feedback 1
+ 	        if (TOTAL_EXECUTION > 995  && TOTAL_EXECUTION < 1005 ) return 1 ;//to switching for random
 		
 		/*
-		if (inc_per < INF) {
+		if (TOTAL_EXECUTION > 1495 && TOTAL_EXECUTION < 1505) return 1 ;
+		if (TOTAL_EXECUTION > 19995 && TOTAL_EXECUTION < 20005) return 1 ;
+		if (inc_per < GROWTH_SSH && TOTAL_EXECUTION>20005) {
 			
-			if(re_counter<5){
-				re_counter++;
-			}else{
+			if(re_counter < TOLERANCE)	re_counter++;
+			if(re_counter == TOLERANCE){
 				re_counter = 0;
 				return 1;
 			}
