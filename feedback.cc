@@ -75,7 +75,7 @@ int find_empty_area_N(State_Record& empty_state, struct Grans_coverage_map& tmp_
 		tmp.ssthresh = random_range_zero(tmp_map.range_info.ssth_range) + 1;
 		//tmp.srtt = random_range_zero(tmp_map.range_info.rtt_range) + 1;
 		//tmp.rttvar = random_range_zero(tmp_map.range_info.rtvar_range) + 1;
-		tmp.tcp_state = random_range_zero(tmp_map.range_info.state_range);//0, 1, 2, 3
+		//tmp.tcp_state = random_range_zero(tmp_map.range_info.state_range);//0, 1, 2, 3
 		//tmp.prev_tcp_state = random_range_zero(tmp_map.range_info.prev_state_range);//0, 1, 2, 3
 
 		// here empty point needs a mapping operation to be searched in coverage map
@@ -314,7 +314,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 			/*case rttvar:
 				uprange = covg_map_vec[i].range_info.rtvar_range;
 				index = empty_set.rttvar;
-				break;*/
+				break;
 			case state:
 				uprange = covg_map_vec[i].range_info.state_range;
 				index = empty_set.tcp_state;
