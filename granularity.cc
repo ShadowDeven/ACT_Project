@@ -30,7 +30,7 @@ int state_granularity_mapping(struct State_Record& old_record, int granularity, 
 	//new_record.srtt = (old_record.srtt - 1) / granularity;
 	//new_record.rttvar = (old_record.rttvar - 1) / granularity;
 	//new_record.target = (old_record.target - 1) / granularity;
-	new_record.tcp_state = old_record.tcp_state ; // no grain for states
+	//new_record.tcp_state = old_record.tcp_state ; // no grain for states
 	//new_record.prev_tcp_state = old_record.prev_tcp_state ;
 	return 0;
 }
@@ -136,12 +136,12 @@ int cal_range (struct RANGE_INFO & range_info, int granularity)
 	//range_info.target_range = TARGET_RANGE / granularity;
 	//range_info.rtt_range = granularity >= RTT_RANGE ? 1 : RTT_RANGE / granularity;
 	//range_info.rtvar_range = granularity >= RTVAR_RANGE ? 1 : RTVAR_RANGE / granularity;
-	range_info.state_range = STATE_RANGE; // / (tcp_state_granularity); no grain for states
+	//range_info.state_range = STATE_RANGE; // / (tcp_state_granularity); no grain for states
 	//range_info.prev_state_range = STATE_RANGE;
 	//TO DO
 	range_info.total = range_info.cwnd_range * range_info.ssth_range;
 			//* range_info.rtt_range //* range_info.rtvar_range;
-		 	* range_info.state_range;
+		 	//* range_info.state_range;
 		 	//* range_info.prev_state_range;
 	return 0;
 }

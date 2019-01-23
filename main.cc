@@ -36,7 +36,7 @@ INPUT_OUT_MAP input_output_map;
 int index_i = 0;
 int granularity = 1;
 
-unsigned int Prev_state = 0;
+//unsigned int Prev_state = 0;
 
 //format:d,c:%u,s:%u,ca:%u,r:%u,o:%u,t:%u
 int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_config, vector<struct Test_Parems>& test_para_vec)
@@ -95,21 +95,21 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	average_record.ssth_aver += (ssthresh - average_record.ssth_aver) * 1.0 / (index_i + 1);
 	//average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
 	//average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
-	average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
+	//average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
 	//average_record.prev_state_aver += (Prev_state - average_record.prev_state_aver) * 1.0 / (index_i + 1);
 	//average_record.target_aver += (target - average_record.target_aver) * 1.0 / (index_i + 1);
 	index_i++;
 
 	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE 
 		//&& srtt > 0 && srtt <= RTT_RANGE //&& rttvar > 0 && rttvar <= RTVAR_RANGE 
-		&& state >= 0 && state < STATE_RANGE 
+		//&& state >= 0 && state < STATE_RANGE 
 		&& curr_time > 0)  //ssthresh at least 2
 	{
-		struct State_Record tmp(cwnd, ssthresh, state, curr_time);
+		struct State_Record tmp(cwnd, ssthresh, curr_time);
 		insert_state(tmp, trace, map_config, test_para_vec);
 	}
 	
-	Prev_state = state;
+	//Prev_state = state;
 	return 0;
 }
 
@@ -220,12 +220,15 @@ void prepare_before_config_vec(vector<struct Test_Parems>& vec_test_para)
 		output_file << vec_test_para.size() << "\n";
 		for (unsigned int i = 0; i < vec_test_para.size(); i++)
 		{
-			output_file << vec_test_para[i].speed
+			output_file 
+				//<< vec_test_para[i].speed
+				<< 1000	//speed
 				<< " " << vec_test_para[i].sftgma.alpha
 				<< " " << vec_test_para[i].sftgma.beta
 				<< " " << vec_test_para[i].sftgma.shift
 				<< " " << vec_test_para[i].Loss_rate
-				<< " " << vec_test_para[i].app_speed
+				//<< " " << vec_test_para[i].app_speed
+				<< 1000000	//app_speed
 				<< " " << vec_test_para[i].rng_run
 				<< " " << vec_test_para[i].curr_time
 				<< "\n";
@@ -248,7 +251,7 @@ void prepare_before_config_vec(vector<struct Test_Parems>& vec_test_para)
 		cout << "[Error] Canot output config vec!" << endl;
 		return ;
 	}
-
+	
 	system("cp /tmp/input_config.txt /tmp/output/"); // Record this input paremeter
 
 }
