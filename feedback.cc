@@ -274,16 +274,16 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 	bool lowbound_limit = false;
 	State_Record low_state, up_state;
 
-	cout << "Target empty_set:";
-	original_empty_set.print();
+	//cout << "Target empty_set:";
+	//original_empty_set.print();
 
 	for (i = 0; i < covg_map_vec.size() ; i++)
 	{
 		state_granularity_mapping(original_empty_set, covg_map_vec[i].granularity, empty_set_record);
 		int output_counter = Output_type_end; //for each granularity, we need to try all output types
 		int int_output;
-		if (DEBUG)
-		{
+
+		if (i==0){
 			cout << "Mapping empty_set:";
 			empty_set_record.print();
 		}
@@ -351,13 +351,13 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				/*case srtt:
 					empty_set.srtt = uprange_i;
 					break;
-				/*case rttvar:
+				case rttvar:
 					empty_set.rttvar = uprange_i;
-					break;*/
+					break;
 				case state:
 					empty_set.tcp_state = uprange_i;
 					break;
-				/*case prev_state:
+				case prev_state:
 					empty_set.prev_tcp_state = uprange_i;
 					break;
 				case target:
@@ -400,11 +400,11 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 					break;
 				/*case rttvar:
 					empty_set.rttvar = low_i;
-					break;*/
+					break;
 				case state:
 					empty_set.tcp_state = low_i;
 					break;
-				/*case prev_state:
+				*case prev_state:
 					empty_set.prev_tcp_state = low_i;
 					break;
 				case target:
@@ -439,15 +439,14 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 			//find a limit point
 			if (!lowbound_limit || !upbound_limit)
 			{
-				if (lowbound_limit || upbound_limit)	
-					cout << "[Limit] Find candidate points at granularity:" << covg_map_vec[i].granularity << endl;
-				else
-					cout << "[Limit] Find candidate points at granularity:" << covg_map_vec[i].granularity << endl;
-				
+				//if (lowbound_limit || upbound_limit)	
+				if (!lowbound_limit && upbound_limit) cout << "[CAN] Find low limit, candidate points: " << upbound<<" and "<<lowbound<<" at granularity:" << covg_map_vec[i].granularity << endl;
+				if (lowbound_limit && !upbound_limit) cout << "[CAN] Find up limit, candidate points: "<< upbound<<" and "<<lowbound<<" at granularity:" << covg_map_vec[i].granularity << endl;
+				 if (!lowbound_limit && !upbound_limit) cout << "[CAN] Find both limits, candidate points: " << upbound<<" and "<<lowbound<<" at granularity:" << covg_map_vec[i].granularity << endl;
+
 				break;
 			};
 		}
-
 		if (!lowbound_limit || !upbound_limit)
 			break; // To exit the main loop
 	}
@@ -455,7 +454,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 	if (upbound_limit && lowbound_limit)
 	{
 		//if(DEBUG)
-		cout << "[Limit] Cannot find candidate points!" << endl;
+		cout << "[CAN] Cannot find candidate points!" << endl;
 		return -1;
 	}
 
@@ -649,8 +648,8 @@ int generate_new_test_para_vec_N(int feedback_mode, struct State_Record & empty_
 								vector<vector<struct Test_Parems> > & new_test_para_vec, 
 								INPUT_OUT_MAP & input_output_map)
 {
-	int i=state;
- 	while(i==state){i=random_range_zero(Output_type_end);}
+	int i;
+ 	i=random_range_zero(Output_type_end);
 	switch (i)
 	{
 	case cwnd:
@@ -659,12 +658,12 @@ int generate_new_test_para_vec_N(int feedback_mode, struct State_Record & empty_
 		return generate_new_test_para_vec_1D(feedback_mode, ssth, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	/*case srtt:
 		return generate_new_test_para_vec_1D(feedback_mode, srtt, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
-	/*case rttvar:
-		return generate_new_test_para_vec_1D(feedback_mode, rttvar, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);*/
+	case rttvar:
+		return generate_new_test_para_vec_1D(feedback_mode, rttvar, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case state:
 		cout << "[Error] State could not be mutated or crossovered!!" << endl;
 		//return generate_new_test_para_vec_1D(feedback_mode, state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
-	/*case prev_state:
+	case prev_state:
 		return generate_new_test_para_vec_1D(feedback_mode, prev_state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case target:
 		return generate_new_test_para_vec_1D(feedback_mode, target, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
