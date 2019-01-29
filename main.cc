@@ -177,11 +177,15 @@ int coverage_check(COVG_MAP_VEC& trace){
 		if (inc_per < COVG_LIMIT_FEEDBACK1) return 2 ;//to switching for feedback 1
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
 	*/
-		if (TOTAL_EXECUTION > 10995 && TOTAL_EXECUTION < 15995) return 1 ;//to switching for feedback 2
-		if (TOTAL_EXECUTION > 5995 && TOTAL_EXECUTION < 6005) return 1 ;//to switching for feedback 1
- 	        if (TOTAL_EXECUTION > 995  && TOTAL_EXECUTION < 1005 ) return 1 ;//to switching for random
-		
+		if (TOTAL_EXECUTION > 14995 && TOTAL_EXECUTION < 15005) return 1 ;//to switching for feedback 2
+		if (TOTAL_EXECUTION > 9995 && TOTAL_EXECUTION < 10005) return 1 ;//to switching for feedback 1
+ 	        if (TOTAL_EXECUTION >4995  && TOTAL_EXECUTION < 5005 ) return 1 ;//to switching for random
 		/*
+		if (TOTAL_EXECUTION > 25 && TOTAL_EXECUTION < 35) return 1 ;//to switching for feedback 2
+                if (TOTAL_EXECUTION > 15 && TOTAL_EXECUTION < 25) return 1 ;//to switching for feedback 1
+                if (TOTAL_EXECUTION >5  && TOTAL_EXECUTION < 15 ) return 1 ;//to switching for random
+				
+		
 		if (TOTAL_EXECUTION > 1495 && TOTAL_EXECUTION < 1505) return 1 ;
 		if (TOTAL_EXECUTION > 19995 && TOTAL_EXECUTION < 20005) return 1 ;
 		if (inc_per < GROWTH_SSH && TOTAL_EXECUTION>20005) {
@@ -223,7 +227,7 @@ void prepare_before_config_vec(vector<struct Test_Parems>& vec_test_para)
 		{
 			output_file 
 				//<< vec_test_para[i].speed
-				<< 1000	//speed
+				<< 10000	//speed
 				<< " " << vec_test_para[i].sftgma.alpha
 				<< " " << vec_test_para[i].sftgma.beta
 				<< " " << vec_test_para[i].sftgma.shift
