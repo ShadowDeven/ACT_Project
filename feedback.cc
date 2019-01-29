@@ -13,6 +13,10 @@ extern int granularity;
 extern int read_from_file(char* filename1, COVG_MAP_VEC& trace, Config_Map& map_config,  vector<struct Test_Parems>& test_para_vec);
 extern int coverage_check(COVG_MAP_VEC& trace);
 
+double place_holder;
+
+
+
 int get_app_speed(int app_speed)
 {
 	int tmp_id;
@@ -263,7 +267,14 @@ int get_input_output_relation(Test_Parems_Limite& test_limit, Output_type output
 int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct State_Record original_empty_set, COVG_MAP_VEC& covg_map_vec, Config_Map& map_config, vector<vector<struct Test_Parems> > & new_test_para_vec, INPUT_OUT_MAP& input_output_map)
 {
 
-	cout << "Output_type:" << output << endl;
+	cout << "Output_type:" ;
+
+	switch(output)
+	{
+	case cwnd: cout << "cwnd" <<endl;
+	case ssth: cout << "ssth" <<endl;
+
+	}
 
 	int index = 0, uprange = 0 , lowrange = -1;
 	int i = 0;
@@ -500,10 +511,12 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 		new_test_para.sftgma.shift = a1 * it_config->second[config_index].sftgma.shift + a2 * test_limit.shift_inc_output_vec[random_range_zero(test_limit.shift_inc_output_vec.size())];
 		a1 = random_range_double();
 		a2 = 1 - a1;
-
-		new_test_para.Loss_rate = a1 * it_config->second[config_index].Loss_rate + a2 * test_limit.loss_rate_inc_output_vec[random_range_zero(test_limit.loss_rate_inc_output_vec.size())];
+	
+		place_holder=test_limit.loss_rate_inc_output_vec[random_range_zero(test_limit.loss_rate_inc_output_vec.size())];	
+		new_test_para.Loss_rate = a1 * it_config->second[config_index].Loss_rate + a2 * place_holder;
 		a1 = random_range_double();
 		a2 = 1 - a1;
+		cout << "Loss rate = "<< "a1* "<<it_config->second[config_index].Loss_rate<<" + a2* "<<place_holder<< " = "<<new_test_para.Loss_rate<<endl;
 		
 		new_test_para.app_speed = a1 * it_config->second[config_index].app_speed + a2 * test_limit.app_speed_inc_output_vec[random_range_zero(test_limit.app_speed_inc_output_vec.size())];
 
@@ -553,9 +566,12 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 			a2 = 1 - a1;
 			new_test_para.sftgma.shift = a1 * it_config->second[config_index].sftgma.shift + a2 * test_limit.shift_dec_output_vec[random_range_zero(test_limit.shift_dec_output_vec.size())];
 
+			place_holder= test_limit.loss_rate_dec_output_vec[random_range_zero(test_limit.loss_rate_dec_output_vec.size())];
 			a1 = random_range_double();
 			a2 = 1 - a1;
-			new_test_para.Loss_rate = a1 * it_config->second[config_index].Loss_rate + a2 * test_limit.loss_rate_dec_output_vec[random_range_zero(test_limit.loss_rate_dec_output_vec.size())];
+			new_test_para.Loss_rate = a1 * it_config->second[config_index].Loss_rate + a2 * place_holder;
+	  		cout << "Loss rate = "<< "a1* "<<it_config->second[config_index].Loss_rate<<" + a2* "<<place_holder<< " = "<<new_test_para.Loss_rate<<endl;			
+
 
 			a1 = random_range_double();
 			a2 = 1 - a1;
@@ -611,7 +627,9 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				new_test_para = (random_range_zero(2) > 0) ? tmp_test_parems_vec[0].first[0] : tmp_test_parems_vec[0].second[0]; // half first, half second;
 				double a1 = random_range_double();
 				double a2 = 1 - a1;
+				
 				new_test_para.Loss_rate = a1 * tmp_test_parems_vec[0].first[0].Loss_rate + a2 * tmp_test_parems_vec[0].second[0].Loss_rate;
+				cout << "Loss rate = "<< "a1* "<<tmp_test_parems_vec[0].first[0].Loss_rate<<" + a2* "<<tmp_test_parems_vec[0].second[0].Loss_rate<< " = "<<new_test_para.Loss_rate<<endl;
 				a1 = random_range_double();
 				a2 = 1 - a1;
 
