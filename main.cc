@@ -104,7 +104,7 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 		&& srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE && state >= 0 && state < STATE_RANGE 
 		&& curr_time > 0)  //ssthresh at least 2
 	{
-		struct State_Record tmp_cube(cwnd, ssthresh, srtt, rttvar, state, curr_time);
+		struct State_Record tmp(cwnd, ssthresh, srtt, rttvar, state, curr_time);
 		insert_state(tmp, trace, map_config, test_para_vec);
 	}
 	
@@ -122,6 +122,7 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 int total_files = 0;
 int prev_coverage_size = 0;
 int re_counter = 0;
+int CoverageCheckPer=20;
 
 /*
 This function is used to process ns3-dce traces and decide to switch feedbacks
@@ -161,7 +162,7 @@ The function to check map coverage
 */
 int coverage_check(COVG_MAP_VEC& trace){
 
-	if (total_files % 100 == 0) //Check current coverage every 5000 times
+	if (total_files % CoverageCheckPer == 0) //Check current coverage every 5000 times
 	{
 		
 		double inc_per = trace[0].coverage_map.size() - prev_coverage_size; //get percentage of map coverage growth
@@ -180,9 +181,9 @@ int coverage_check(COVG_MAP_VEC& trace){
 		*/
 		
 		//Switch based on execution times
-		if (TOTAL_EXECUTION > 14995 && TOTAL_EXECUTION < 15005) return 1 ;//to switching for feedback 2
-		if (TOTAL_EXECUTION > 9995 && TOTAL_EXECUTION < 10005) return 1 ;//to switching for feedback 1
- 	    if (TOTAL_EXECUTION >4995  && TOTAL_EXECUTION < 5005 ) return 1 ;//to switching for random
+		if (TOTAL_EXECUTION > 95 && TOTAL_EXECUTION < 105) return 1 ;//to switching for feedback 2
+		if (TOTAL_EXECUTION > 195 && TOTAL_EXECUTION < 205) return 1 ;//to switching for feedback 1
+ 	    if (TOTAL_EXECUTION >295  && TOTAL_EXECUTION < 305 ) return 1 ;//to switching for random
 		
 		//switch based on consecutive growth  
 		/*
