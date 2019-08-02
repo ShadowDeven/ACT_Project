@@ -93,19 +93,18 @@ int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_co
 	else if (state == 3) state = 2; // substitute State CWR(2) with State Recovery(3) for state(0-3)
 	average_record.cwnd_aver += (cwnd - average_record.cwnd_aver) * 1.0 / (index_i + 1);
 	average_record.ssth_aver += (ssthresh - average_record.ssth_aver) * 1.0 / (index_i + 1);
-	//average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
-	//average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
-	//average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
+	average_record.rtt_aver += (srtt - average_record.rtt_aver) * 1.0 / (index_i + 1);
+	average_record.rttvar_aver += (rttvar - average_record.rttvar_aver) * 1.0 / (index_i + 1);
+	average_record.state_aver += (state - average_record.state_aver) * 1.0 / (index_i + 1);
 	//average_record.prev_state_aver += (Prev_state - average_record.prev_state_aver) * 1.0 / (index_i + 1);
 	//average_record.target_aver += (target - average_record.target_aver) * 1.0 / (index_i + 1);
 	index_i++;
 
-	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE 
-		//&& srtt > 0 && srtt <= RTT_RANGE //&& rttvar > 0 && rttvar <= RTVAR_RANGE 
-		//&& state >= 0 && state < STATE_RANGE 
+	if (cwnd > 0 && cwnd <= CWND_RANGE && ssthresh > 0 && ssthresh <= SSTH_RANGE && srtt > 0 
+		&& srtt <= RTT_RANGE && rttvar > 0 && rttvar <= RTVAR_RANGE && state >= 0 && state < STATE_RANGE 
 		&& curr_time > 0)  //ssthresh at least 2
 	{
-		struct State_Record tmp(cwnd, ssthresh, curr_time);
+		struct State_Record tmp_cube(cwnd, ssthresh, srtt, rttvar, state, curr_time);
 		insert_state(tmp, trace, map_config, test_para_vec);
 	}
 	
@@ -171,25 +170,25 @@ int coverage_check(COVG_MAP_VEC& trace){
 
 		cal_coverage_AllGrans (covg_map_vec);
 		prev_coverage_size = trace[0].coverage_map.size(); // Defalut focus on 128 size coverage
+		
+		//Switch based on coverage growth
 		/*
 		// could add a switching time; random could be just 10%, feedback apply different %
 		if (inc_per < COVG_LIMIT_FEEDBACK2) return 3 ;//to switching for feedback 2
 		if (inc_per < COVG_LIMIT_FEEDBACK1) return 2 ;//to switching for feedback 1
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
-	*/
+		*/
+		
+		//Switch based on execution times
 		if (TOTAL_EXECUTION > 14995 && TOTAL_EXECUTION < 15005) return 1 ;//to switching for feedback 2
 		if (TOTAL_EXECUTION > 9995 && TOTAL_EXECUTION < 10005) return 1 ;//to switching for feedback 1
- 	        if (TOTAL_EXECUTION >4995  && TOTAL_EXECUTION < 5005 ) return 1 ;//to switching for random
-		/*
-		if (TOTAL_EXECUTION > 25 && TOTAL_EXECUTION < 35) return 1 ;//to switching for feedback 2
-                if (TOTAL_EXECUTION > 15 && TOTAL_EXECUTION < 25) return 1 ;//to switching for feedback 1
-                if (TOTAL_EXECUTION >5  && TOTAL_EXECUTION < 15 ) return 1 ;//to switching for random
-				
+ 	    if (TOTAL_EXECUTION >4995  && TOTAL_EXECUTION < 5005 ) return 1 ;//to switching for random
 		
+		//switch based on consecutive growth  
+		/*
 		if (TOTAL_EXECUTION > 1495 && TOTAL_EXECUTION < 1505) return 1 ;
 		if (TOTAL_EXECUTION > 19995 && TOTAL_EXECUTION < 20005) return 1 ;
 		if (inc_per < GROWTH_SSH && TOTAL_EXECUTION>20005) {
-			
 			if(re_counter < TOLERANCE)	re_counter++;
 			if(re_counter == TOLERANCE){
 				re_counter = 0;
@@ -199,6 +198,7 @@ int coverage_check(COVG_MAP_VEC& trace){
 			re_counter = 0;
 		}
 		*/	
+		
 		system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches"); //used to free system resource
 	}
 	
@@ -304,11 +304,6 @@ int try_per_config(int i, int mode) {	//test input i
 	//print the value of the inputs
 	prepare_before_config_vec(test_para_vec);
 	
-	//launch ns3
-	/*for (int j = 1; j <= TRIES_PER; j++){
-		
-		res = execute_ns3_2(0); //mode 0
-	}*/
 	res = execute_ns3_2(0);
 	
 	if (res == -1){		//if execution fails
@@ -336,23 +331,7 @@ int try_per_config(int i, int mode) {	//test input i
 		input_output_relation.push_back(make_pair(test_para, average_record));
 	
 	}
-	/*
-	//print output values
-	snprintf (mvcmd, 256, "/tmp/output/%d/messages", TOTAL_EXECUTION);
-	res = read_from_file(mvcmd, covg_map_vec, config_map, test_para_vec); 
-
-	//after
-	snprintf (mvcmd, 256, "mv /tmp/output /tmp/output_all/config_%d", TOTAL_EXECUTION);
-	system(mvcmd);
-
-	if (DEBUG)
-	{
-		cout << "Input Test_Parems:" << endl;
-		test_para.print();
-	}
-
-	input_output_relation.push_back(make_pair(test_para, average_record));
-	*/
+	
 	return res;
 }
 
@@ -438,16 +417,10 @@ int main (int argc, char* argv[])
 	purely_random_testing(0);
 	pearson_corrleation(input_output_relation, input_output_map); // To get pearson corrleation
 
-	//cout << "[Purely Random] 5d coverage:" << endl;
-	//cal_coverage_AllGrans(covg_map_vec);
-
 	cmd_init_feedback();
-	
 	
 	cout << "[Stage] Begin feedback 1: " << endl;
 	feedback_random_N(1, covg_map_vec, config_map, input_output_map);
-
-	//cal_coverage_AllGrans(covg_map_vec);
 
 	system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches");
 	
