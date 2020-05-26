@@ -181,9 +181,9 @@ int coverage_check(COVG_MAP_VEC& trace){
 		*/
 		
 		//Switch based on execution times
-		if (TOTAL_EXECUTION > 95 && TOTAL_EXECUTION < 105) return 1 ;//to switching for feedback 2
-		if (TOTAL_EXECUTION > 195 && TOTAL_EXECUTION < 205) return 1 ;//to switching for feedback 1
- 	    if (TOTAL_EXECUTION >295  && TOTAL_EXECUTION < 305 ) return 1 ;//to switching for random
+		if (TOTAL_EXECUTION > 5 && TOTAL_EXECUTION < 15) return 1 ;//to switching for feedback 2
+		if (TOTAL_EXECUTION > 15 && TOTAL_EXECUTION < 25) return 1 ;//to switching for feedback 1
+ 	    if (TOTAL_EXECUTION >25  && TOTAL_EXECUTION < 35 ) return 1 ;//to switching for random
 		
 		//switch based on consecutive growth  
 		/*
