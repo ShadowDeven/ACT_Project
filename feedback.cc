@@ -77,9 +77,9 @@ int find_empty_area_N(State_Record& empty_state, struct Grans_coverage_map& tmp_
 	{
 		tmp.cwnd = random_range_zero(tmp_map.range_info.cwnd_range) + 1;// 0 - 1023 in coverage map
 		tmp.ssthresh = random_range_zero(tmp_map.range_info.ssth_range) + 1;
-		tmp.srtt = random_range_zero(tmp_map.range_info.rtt_range) + 1;
-		tmp.rttvar = random_range_zero(tmp_map.range_info.rtvar_range) + 1;
-		tmp.tcp_state = random_range_zero(tmp_map.range_info.state_range);//0, 1, 2, 3
+		//tmp.srtt = random_range_zero(tmp_map.range_info.rtt_range) + 1;
+		//tmp.rttvar = random_range_zero(tmp_map.range_info.rtvar_range) + 1;
+		//tmp.tcp_state = random_range_zero(tmp_map.range_info.state_range);//0, 1, 2, 3
 		//tmp.prev_tcp_state = random_range_zero(tmp_map.range_info.prev_state_range);//0, 1, 2, 3
 
 		// here empty point needs a mapping operation to be searched in coverage map
@@ -267,7 +267,14 @@ int get_input_output_relation(Test_Parems_Limite& test_limit, Output_type output
 int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct State_Record original_empty_set, COVG_MAP_VEC& covg_map_vec, Config_Map& map_config, vector<vector<struct Test_Parems> > & new_test_para_vec, INPUT_OUT_MAP& input_output_map)
 {
 
-	cout << "Output_type: "<<output<<endl;
+	cout << "Output_type:" ;
+
+	switch(output)
+	{
+	case cwnd: cout << "cwnd" <<endl;
+	case ssth: cout << "ssth" <<endl;
+
+	}
 
 	int index = 0, uprange = 0 , lowrange = -1;
 	int i = 0;
@@ -311,11 +318,11 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				uprange = covg_map_vec[i].range_info.ssth_range;
 				index = empty_set.ssthresh;
 				break;
-			case srtt:
+			/*case srtt:
 				uprange = covg_map_vec[i].range_info.rtt_range;
 				index = empty_set.srtt;
 				break;
-			case rttvar:
+			/*case rttvar:
 				uprange = covg_map_vec[i].range_info.rtvar_range;
 				index = empty_set.rttvar;
 				break;
@@ -352,7 +359,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case ssth:
 					empty_set.ssthresh = uprange_i;
 					break;
-				case srtt:
+				/*case srtt:
 					empty_set.srtt = uprange_i;
 					break;
 				case rttvar:
@@ -361,7 +368,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case state:
 					empty_set.tcp_state = uprange_i;
 					break;
-				/*case prev_state:
+				case prev_state:
 					empty_set.prev_tcp_state = uprange_i;
 					break;
 				case target:
@@ -399,16 +406,16 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				case ssth:
 					empty_set.ssthresh = low_i;
 					break;
-				case srtt:
+				/*case srtt:
 					empty_set.srtt = low_i;
 					break;
-				case rttvar:
+				/*case rttvar:
 					empty_set.rttvar = low_i;
 					break;
 				case state:
 					empty_set.tcp_state = low_i;
 					break;
-				/*case prev_state:
+				*case prev_state:
 					empty_set.prev_tcp_state = low_i;
 					break;
 				case target:
@@ -446,7 +453,7 @@ int generate_new_test_para_vec_1D(int feedback_mode, Output_type output, struct 
 				//if (lowbound_limit || upbound_limit)	
 				if (!lowbound_limit && upbound_limit) cout << "[CAN] Find low limit, candidate points: " << upbound<<" and "<<lowbound<<" at granularity:" << covg_map_vec[i].granularity << endl;
 				if (lowbound_limit && !upbound_limit) cout << "[CAN] Find up limit, candidate points: "<< upbound<<" and "<<lowbound<<" at granularity:" << covg_map_vec[i].granularity << endl;
-				if (!lowbound_limit && !upbound_limit) cout << "[CAN] Find both limits, candidate points: " << upbound<<" and "<<lowbound<<" at granularity:" << covg_map_vec[i].granularity << endl;
+				 if (!lowbound_limit && !upbound_limit) cout << "[CAN] Find both limits, candidate points: " << upbound<<" and "<<lowbound<<" at granularity:" << covg_map_vec[i].granularity << endl;
 
 				break;
 			};
@@ -667,14 +674,14 @@ int generate_new_test_para_vec_N(int feedback_mode, struct State_Record & empty_
 		return generate_new_test_para_vec_1D(feedback_mode, cwnd, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case ssth:
 		return generate_new_test_para_vec_1D(feedback_mode, ssth, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
-	case srtt:
+	/*case srtt:
 		return generate_new_test_para_vec_1D(feedback_mode, srtt, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case rttvar:
 		return generate_new_test_para_vec_1D(feedback_mode, rttvar, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case state:
-		//cout << "[Error] State could not be mutated or crossovered!!" << endl;
-		return generate_new_test_para_vec_1D(feedback_mode, state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
-	/*case prev_state:
+		cout << "[Error] State could not be mutated or crossovered!!" << endl;
+		//return generate_new_test_para_vec_1D(feedback_mode, state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
+	case prev_state:
 		return generate_new_test_para_vec_1D(feedback_mode, prev_state, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);
 	case target:
 		return generate_new_test_para_vec_1D(feedback_mode, target, empty_set, map_vec, map_config, new_test_para_vec, input_output_map);

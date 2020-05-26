@@ -32,9 +32,9 @@ struct Person_elems
 
 	vector<double> y_cwnd;
 	vector<double> y_ssth;
-	vector<double> y_srtt;
-	vector<double> y_rttvar;
-	vector<double> y_state;
+	//vector<double> y_srtt;
+	//vector<double> y_rttvar;
+	//vector<double> y_state;
 	//vector<double> y_prev_state;
 	//vector<double> y_target;
 };
@@ -259,9 +259,9 @@ int Push_map(Person_elems& total_person, struct Test_Parems test, Record_average
 
 	total_person.y_cwnd.push_back(record.cwnd_aver);
 	total_person.y_ssth.push_back(record.ssth_aver);
-	total_person.y_srtt.push_back(record.rtt_aver);
-	total_person.y_rttvar.push_back(record.rttvar_aver);
-	total_person.y_state.push_back(record.state_aver);
+	//total_person.y_srtt.push_back(record.rtt_aver);
+	//total_person.y_rttvar.push_back(record.rttvar_aver);
+	//total_person.y_state.push_back(record.state_aver);
 	//total_person.y_prev_state.push_back(record.prev_state_aver);
 	//total_person.y_target.push_back(record.target_aver);
 	return 0;
@@ -882,10 +882,10 @@ int pearson_corrleation(vector<pair<struct Test_Parems, Record_average> > input_
 									pearson_corrleation_struct(input.input_type, it->second, single_corrleation);
 									total_single_corrleation._cwnd += single_corrleation._cwnd;
 									total_single_corrleation._ssth += single_corrleation._ssth;
-									total_single_corrleation._srtt += single_corrleation._srtt;
-									total_single_corrleation._rttvar += single_corrleation._rttvar;
+									//total_single_corrleation._srtt += single_corrleation._srtt;
+									//total_single_corrleation._rttvar += single_corrleation._rttvar;
 									//total_single_corrleation._target += single_corrleation._target;
-									total_single_corrleation._state += single_corrleation._state;
+									//otal_single_corrleation._state += single_corrleation._state;
 									//total_single_corrleation._prev_state += single_corrleation._prev_state;
 									counter++ ;
 								}
@@ -902,10 +902,10 @@ int pearson_corrleation(vector<pair<struct Test_Parems, Record_average> > input_
 
 		total_single_corrleation._cwnd /= counter;
 		total_single_corrleation._ssth /= counter;
-		total_single_corrleation._srtt /= counter;
-		total_single_corrleation._rttvar /= counter;
+		//total_single_corrleation._srtt /= counter;
+		//total_single_corrleation._rttvar /= counter;
 		//total_single_corrleation._target /= counter;
-		total_single_corrleation._state /= counter;
+		//total_single_corrleation._state /= counter;
 		//total_single_corrleation._prev_state /= counter;
 
 		total_single_corrleation.inputType = input.input_type;
@@ -914,10 +914,10 @@ int pearson_corrleation(vector<pair<struct Test_Parems, Record_average> > input_
 			<< " samples: " << counter
 			<< " correlation cwnd: " << total_single_corrleation._cwnd
 			<< " correlation ssth: " << total_single_corrleation._ssth
-			<< " correlation srtt: " << total_single_corrleation._srtt
-			<< " correlation rttvar: " << total_single_corrleation._rttvar
+			//<< " correlation srtt: " << total_single_corrleation._srtt
+			//<< " correlation rttvar: " << total_single_corrleation._rttvar
 			//<< " correlation target: " << total_single_corrleation._target
-			<< " correlation state: " << total_single_corrleation._state
+			//<< " correlation state: " << total_single_corrleation._state
 			//<< " correlation previous state: " << total_single_corrleation._prev_state
 			<< endl;
 
