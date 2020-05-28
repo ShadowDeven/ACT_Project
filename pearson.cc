@@ -354,7 +354,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._rttvar = pearson_res ;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_speed, total_person.y_state, total_person.x_speed.size());
 		if (DEBUG) cout << "Pearson corrleation between speed and state:" << pearson_res << endl;
 
@@ -366,7 +366,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._state = pearson_res;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_speed, total_person.y_prev_state, total_person.x_speed.size());
 		if (DEBUG) cout << "Pearson corrleation between speed and prev_state:" << pearson_res << endl;
 
@@ -449,7 +449,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._state = pearson_res;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_loss, total_person.y_prev_state, total_person.x_speed.size());
 		if (DEBUG) cout << "Pearson corrleation between Loss rate and _prev_state:" << pearson_res << endl;
 
@@ -522,7 +522,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._rttvar = pearson_res ;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_alpha, total_person.y_state, total_person.x_speed.size());
 		if (DEBUG)  cout << "Pearson corrleation between alpha and _state:" << pearson_res << endl;
 		if (std::isnan(pearson_res))
@@ -533,7 +533,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._state = pearson_res;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_alpha, total_person.y_prev_state, total_person.x_speed.size());
 		if (DEBUG)  cout << "Pearson corrleation between alpha and _prev_state:" << pearson_res << endl;
 		if (std::isnan(pearson_res))
@@ -605,7 +605,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._rttvar = pearson_res ;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_beta, total_person.y_state, total_person.x_speed.size());
 		if (DEBUG)cout << "Pearson corrleation between beta and _state:" << pearson_res << endl;
 		if (std::isnan(pearson_res))
@@ -616,7 +616,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._state = pearson_res;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_beta, total_person.y_prev_state, total_person.x_speed.size());
 		if (DEBUG)cout << "Pearson corrleation between beta and _prev_state:" << pearson_res << endl;
 		if (std::isnan(pearson_res))
@@ -687,7 +687,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._rttvar = pearson_res ;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_shift, total_person.y_state, total_person.x_speed.size());
 		if (DEBUG) cout << "Pearson corrleation between shift and _state:" << pearson_res << endl;
 		if (std::isnan(pearson_res))
@@ -698,7 +698,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._state = pearson_res;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_shift, total_person.y_prev_state, total_person.x_speed.size());
 		if (DEBUG) cout << "Pearson corrleation between shift and _prev_state:" << pearson_res << endl;
 		if (std::isnan(pearson_res))
@@ -776,7 +776,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._rttvar = pearson_res ;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_app_speed, total_person.y_state, total_person.x_app_speed.size());
 		if (DEBUG) cout << "Pearson corrleation between app_speed and _state:" << pearson_res << endl;
 
@@ -788,7 +788,7 @@ int pearson_corrleation_struct(enum Input_type input_type, struct Person_elems& 
 		{
 			input_output_struct._state = pearson_res;
 		}
-		
+		/*
 		pearson_res = Person_coefficient(total_person.x_app_speed, total_person.y_prev_state, total_person.x_app_speed.size());
 		if (DEBUG) cout << "Pearson corrleation between app_speed and _prev_state:" << pearson_res << endl;
 
@@ -885,7 +885,7 @@ int pearson_corrleation(vector<pair<struct Test_Parems, Record_average> > input_
 									//total_single_corrleation._srtt += single_corrleation._srtt;
 									//total_single_corrleation._rttvar += single_corrleation._rttvar;
 									//total_single_corrleation._target += single_corrleation._target;
-									//otal_single_corrleation._state += single_corrleation._state;
+									//total_single_corrleation._state += single_corrleation._state;
 									//total_single_corrleation._prev_state += single_corrleation._prev_state;
 									counter++ ;
 								}

@@ -34,8 +34,7 @@ enum Input_type_2 {access_speed, access_delay, bottneck_speed, bottneck_delay, r
 enum Output_type {cwnd = 0, ssth, 
 					//srtt,
 					//rttvar, 
-					//state, 
-					//prev_state, target,
+					//state, prev_state, target,
 					 Output_type_end};
 
 struct single_input_all_output
@@ -432,14 +431,14 @@ struct State_Record
 
 	void print()
 	{
-		cout << "cwnd: " << cwnd
-			<< " ssth: " << ssthresh
-			//<< " srtt: " << srtt
-			//<< " rttvar: " << rttvar
-			//<< " ca_state: " << tcp_state
-			//<< " prev_ca_state: " << prev_tcp_state
-			//<< " bic_target: " << target
-			<< " switching_time: " << curr_time
+		cout << "cwnd:" << cwnd
+			<< " ssth:" << ssthresh
+			//<< " srtt:" << srtt
+			//<< " rttvar:" << rttvar
+			//<< " ca_state:" << tcp_state
+			//<< " prev_ca_state:" << prev_tcp_state
+			//<< " bic_target:" << target
+			<< " switching_time:" << curr_time
 			<< "\n";
 	}
 
@@ -512,7 +511,7 @@ struct State_Record
 			return true;
 		else if  (tcp_state > other.tcp_state)
 			return false;
-			
+		/*	
 		if (prev_tcp_state < other.prev_tcp_state)
 			return true;
 		else if  (prev_tcp_state > other.prev_tcp_state)

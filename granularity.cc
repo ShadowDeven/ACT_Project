@@ -63,8 +63,7 @@ int insert_state(struct State_Record& tmp, COVG_MAP_VEC& map_vec, Config_Map& co
 		//int rttvar = (tmp.rttvar - 1) / granularity;
 		//int state = tmp.tcp_state ; // no grain for states
 		//int prev_state = tmp.prev_tcp_state ; // no grain for state
-		
-		//TO DO
+
 		struct State_Record tmp_cube(cwnd, ssthresh, 0);
 		Cube_State_Map::iterator it = map_vec[i].coverage_map.find(tmp_cube);
 
@@ -86,10 +85,6 @@ int insert_state(struct State_Record& tmp, COVG_MAP_VEC& map_vec, Config_Map& co
 			coarse_map.insert(make_pair(id, config_id));
 			config_map[config_id] = test_para_vec;
 			map_vec[i].coverage_map.insert(make_pair(tmp_cube, coarse_map));
-			if (granularity == 1){
-				cout << "Find uncovered pairs: ";
-				tmp_cube.print();
-			}
 		}
 	}
 	return 0;
@@ -138,12 +133,9 @@ int cal_range (struct RANGE_INFO & range_info, int granularity)
 	//range_info.rtvar_range = granularity >= RTVAR_RANGE ? 1 : RTVAR_RANGE / granularity;
 	//range_info.state_range = STATE_RANGE; // / (tcp_state_granularity); no grain for states
 	//range_info.prev_state_range = STATE_RANGE;
-
-	//TO DO
 	range_info.total = range_info.cwnd_range * range_info.ssth_range;
 			//* range_info.rtt_range //* range_info.rtvar_range;
-		 	//* range_info.state_range;
-		 	//* range_info.prev_state_range;
+		 	//* range_info.state_range * range_info.prev_state_range;
 	return 0;
 }
 
@@ -243,6 +235,5 @@ double cal_coverage_2d (int choice, int choice2, struct RANGE_INFO& range_info, 
 }*/
 
 #endif
-
 
 
