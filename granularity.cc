@@ -85,6 +85,10 @@ int insert_state(struct State_Record& tmp, COVG_MAP_VEC& map_vec, Config_Map& co
 			coarse_map.insert(make_pair(id, config_id));
 			config_map[config_id] = test_para_vec;
 			map_vec[i].coverage_map.insert(make_pair(tmp_cube, coarse_map));
+			if (granularity == 1){
+				cout << "Find uncovered pairs: ";
+				tmp_cube.print();
+			}
 		}
 	}
 	return 0;
@@ -235,5 +239,6 @@ double cal_coverage_2d (int choice, int choice2, struct RANGE_INFO& range_info, 
 }*/
 
 #endif
+
 
 

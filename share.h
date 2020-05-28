@@ -431,14 +431,14 @@ struct State_Record
 
 	void print()
 	{
-		cout << "cwnd:" << cwnd
-			<< " ssth:" << ssthresh
-			//<< " srtt:" << srtt
-			//<< " rttvar:" << rttvar
-			//<< " ca_state:" << tcp_state
-			//<< " prev_ca_state:" << prev_tcp_state
-			//<< " bic_target:" << target
-			<< " switching_time:" << curr_time
+		cout << "cwnd: " << cwnd
+			<< " ssth: " << ssthresh
+			//<< " srtt: " << srtt
+			//<< " rttvar: " << rttvar
+			//<< " ca_state: " << tcp_state
+			//<< " prev_ca_state: " << prev_tcp_state
+			//<< " bic_target: " << target
+			<< " switching_time: " << curr_time
 			<< "\n";
 	}
 

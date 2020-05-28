@@ -162,12 +162,12 @@ The function to check map coverage
 */
 int coverage_check(COVG_MAP_VEC& trace){
 
-	if (total_files % 1000 == 0) //Check current coverage every 5000 times
+	if (total_files % 100 == 0) //Check current coverage every 5000 times
 	{
 		
 		double inc_per = trace[0].coverage_map.size() - prev_coverage_size; //get percentage of map coverage growth
 
-		cout << "Every 1000 times:" << trace[0].coverage_map.size()  << " ,prev_coverage_size:" << prev_coverage_size << ", growth num count: " << inc_per << " , total files:" << total_files << endl;
+		cout << "Every 100 times:" << trace[0].coverage_map.size()  << " ,prev_coverage_size:" << prev_coverage_size << ", growth num count: " << inc_per << " , total files:" << total_files << endl;
 
 		cal_coverage_AllGrans (covg_map_vec);
 		prev_coverage_size = trace[0].coverage_map.size(); // Defalut focus on 128 size coverage
@@ -176,13 +176,13 @@ int coverage_check(COVG_MAP_VEC& trace){
 		if (inc_per < COVG_LIMIT_FEEDBACK2) return 3 ;//to switching for feedback 2
 		if (inc_per < COVG_LIMIT_FEEDBACK1) return 2 ;//to switching for feedback 1
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
-	
-		if (TOTAL_EXECUTION > 25 && TOTAL_EXECUTION < 35) return 1 ;//to switching for feedback 2
-		 if (TOTAL_EXECUTION > 15 && TOTAL_EXECUTION < 25) return 1 ;//to switching for feedback 1
-        	if (TOTAL_EXECUTION > 5 && TOTAL_EXECUTION < 15 ) return 1 ;//to switching for random
 		*/
-	
-		if (inc_per < GROWTH_SSH) {
+		//if (TOTAL_EXECUTION > 595 && TOTAL_EXECUTION < 605) return 1 ;//to switching for feedback 2
+		if (TOTAL_EXECUTION > 595 && TOTAL_EXECUTION < 605) return 1 ;//to switching for feedback 1
+        	if (TOTAL_EXECUTION >195  && TOTAL_EXECUTION < 205 ) return 1 ;//to switching for random
+		
+		/*
+		if (inc_per < INF) {
 			
 			if(re_counter<5){
 				re_counter++;
@@ -193,7 +193,7 @@ int coverage_check(COVG_MAP_VEC& trace){
 		}else{
 			re_counter = 0;
 		}
-		
+		*/	
 		system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches"); //used to free system resource
 	}
 	
@@ -434,17 +434,18 @@ int main (int argc, char* argv[])
 	//cal_coverage_AllGrans(covg_map_vec);
 
 	cmd_init_feedback();
-
+	
+	
 	cout << "[Stage] Begin feedback 1: " << endl;
 	feedback_random_N(1, covg_map_vec, config_map, input_output_map);
 
 	//cal_coverage_AllGrans(covg_map_vec);
 
 	system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches");
-
-	cout << "[Stage] Begin feedback 2: ";
+	/*
+	cout << "[Stage] Begin feedback 2: " << endl;
 	feedback_random_N(2, covg_map_vec, config_map, input_output_map);
-
+	*/
 	//After feedback coverage
 	cout << "[Stage] Finish succeed!" << endl;
 	cout << "TOTAL_EXECUTION:" << TOTAL_EXECUTION << endl;
