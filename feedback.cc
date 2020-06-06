@@ -69,10 +69,10 @@ int find_empty_area_N(State_Record& empty_state, struct Grans_coverage_map& tmp_
 	Cube_State_Map::iterator it ;
 	struct State_Record tmp;
 	
-	for(int i=0; i< 1000000; i++)
+	for(int i=0; i< 100000; i++)
 	{
-		tmp.cwnd = random_range_zero(tmp_map.range_info.cwnd_range) + 1;// 0 - 1023 in coverage map
-		tmp.ssthresh = random_range_zero(tmp_map.range_info.ssth_range) + 1;
+		tmp.cwnd = random_range_zero(tmp_map.range_info.cwnd_range);// 0 - 1023 in coverage map
+		tmp.ssthresh = random_range_zero(tmp_map.range_info.ssth_range);
 		//tmp.srtt = random_range_zero(tmp_map.range_info.rtt_range) + 1;
 		//tmp.rttvar = random_range_zero(tmp_map.range_info.rtvar_range) + 1;
 		//tmp.tcp_state = random_range_zero(tmp_map.range_info.state_range);//0, 1, 2, 3
@@ -81,12 +81,13 @@ int find_empty_area_N(State_Record& empty_state, struct Grans_coverage_map& tmp_
 		// here empty point needs a mapping operation to be searched in coverage map
 		//as the mapping is done when inserting point into coverage map;
 		struct State_Record coverage_tmp;
-		state_granularity_mapping(tmp, tmp_map.granularity, coverage_tmp); // here granularity 1
+		//state_granularity_mapping(tmp, tmp_map.granularity, coverage_tmp); 
 
-		it = tmp_map.coverage_map.find(coverage_tmp);
+		it = tmp_map.coverage_map.find(tmp);
 		if (it == tmp_map.coverage_map.end()) //Got an empty vector
 		{
-			empty_state = tmp;
+			empty_state.cwnd = tmp.cwnd * tmp_map.granularity;
+			empty_state.ssthresh = tmp.cwnd * tmp_map.granularity;
 			return 0;
 		}
 	}
@@ -678,7 +679,7 @@ int generate_new_test_para_vec_N(int feedback_mode, struct State_Record & empty_
 //int total_folder_feedback = 0;
 
 
-int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map_config, INPUT_OUT_MAP & input_output_map)
+int feedback_random_N(int granularity, int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map_config, INPUT_OUT_MAP & input_output_map)
 {
 	char mvcmd[256] = {0};
 	struct State_Record empty_set;
@@ -694,11 +695,12 @@ int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map
 		
 		for (int i=0; i<100; i++)
 		{	
-			if (find_empty_area_N(empty_set, map_vec[0]) == -1)//to find an empty state given granularity 1
+			if (find_empty_area_N(empty_set, map_vec[granularity]) == -1)//to find an empty state at each granularity
 			{
 				cout << "[Caution] Empty area search fails" << endl;
 				cal_coverage_AllGrans(map_vec);
-				exit(-1); 
+				//exit(-1); 
+				return -1;
 			}
 			
 			error_bit = 0;
@@ -711,7 +713,7 @@ int feedback_random_N(int feedback_mode, COVG_MAP_VEC & map_vec, Config_Map& map
 		if (error_bit == 1){
 			cout << "[Error] Could not find candidate pairs for 100 times" << endl;
 			cal_coverage_AllGrans(map_vec);
-			exit(-1);
+			return -1;
 		}
 		
 

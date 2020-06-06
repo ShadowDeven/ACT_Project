@@ -34,9 +34,9 @@ vector<pair<struct Test_Parems, Record_average> > input_output_relation;
 INPUT_OUT_MAP input_output_map;
 
 int index_i = 0;
-int granularity = 1;
 
 unsigned int Prev_state = 0;
+int granularity;
 
 //format:d,c:%u,s:%u,ca:%u,r:%u,o:%u,t:%u
 int convert_string_to_elem(string& line, COVG_MAP_VEC& trace, Config_Map& map_config, vector<struct Test_Parems>& test_para_vec)
@@ -162,7 +162,11 @@ The function to check map coverage
 */
 int coverage_check(COVG_MAP_VEC& trace){
 
-	if (total_files % 100 == 0) //Check current coverage every 5000 times
+
+	int coverage = (covg_map_vec[granularity].coverage_map.size() * 1.0 /covg_map_vec[granularity].range_info.total)*100;
+
+
+	if (coverage > 70 or total_files % 10 == 0) //Check current coverage every 5000 times
 	{
 		
 		double inc_per = trace[0].coverage_map.size() - prev_coverage_size; //get percentage of map coverage growth
@@ -178,8 +182,8 @@ int coverage_check(COVG_MAP_VEC& trace){
 		if (inc_per < COVG_LIMIT_RANDOM) return 1 ;//to switching for random
 		*/
 		//if (TOTAL_EXECUTION > 595 && TOTAL_EXECUTION < 605) return 1 ;//to switching for feedback 2
-		if (TOTAL_EXECUTION > 595 && TOTAL_EXECUTION < 605) return 1 ;//to switching for feedback 1
-        	if (TOTAL_EXECUTION >195  && TOTAL_EXECUTION < 205 ) return 1 ;//to switching for random
+		if(TOTAL_EXECUTION < 30) return 0;
+		return 1;
 		
 		/*
 		if (inc_per < INF) {
@@ -427,6 +431,7 @@ int main (int argc, char* argv[])
 	cout << "Search guide: [Stage] [Coverage] [Caution] [Error]" << endl;
 	cout << "[Stage] Purely random: " << endl;
 	cmd_init_random();
+	granularity = 0;
 	purely_random_testing(0);
 	pearson_corrleation(input_output_relation, input_output_map); // To get pearson corrleation
 
@@ -434,18 +439,22 @@ int main (int argc, char* argv[])
 	//cal_coverage_AllGrans(covg_map_vec);
 
 	cmd_init_feedback();
-	
-	
-	cout << "[Stage] Begin feedback 1: " << endl;
-	feedback_random_N(1, covg_map_vec, config_map, input_output_map);
 
-	//cal_coverage_AllGrans(covg_map_vec);
+	for(int i=7; i>=0; i--)
+	{
+		granularity = i;
+		cout << "[Stage] Begin feedback 1: " << endl;
+		if( -1 == feedback_random_N(i, 1, covg_map_vec, config_map, input_output_map)) continue;
 
-	system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches");
-	/*
-	cout << "[Stage] Begin feedback 2: " << endl;
-	feedback_random_N(2, covg_map_vec, config_map, input_output_map);
-	*/
+		//cal_coverage_AllGrans(covg_map_vec);
+
+		system("sudo sync && echo 3 | sudo tee /proc/sys/vm/drop_caches");
+	
+		cout << "[Stage] Begin feedback 2: " << endl;
+		if( -1 == feedback_random_N(i, 2, covg_map_vec, config_map, input_output_map)) continue;
+
+	}
+	
 	//After feedback coverage
 	cout << "[Stage] Finish succeed!" << endl;
 	cout << "TOTAL_EXECUTION:" << TOTAL_EXECUTION << endl;

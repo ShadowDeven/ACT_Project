@@ -553,6 +553,7 @@ struct Grans_coverage_map
 	int granularity;
 	Cube_State_Map coverage_map;
 	struct RANGE_INFO range_info;
+	int coverage_info;
 
 	bool operator==(const Grans_coverage_map& other) const
 	{
